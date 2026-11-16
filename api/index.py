@@ -9,6 +9,7 @@ import shutil
 import tempfile
 import traceback
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 # Add project root and backend to sys.path so all internal modules are importable
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -47,28 +48,75 @@ if is_vercel:
             posix_path = f"/{posix_path}"
         os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{posix_path.lstrip('/')}"
 
-try:
-    from backend.app.main import app
-    handler = app
-except Exception as init_exc:
-    tb_str = traceback.format_exc()
-    from fastapi import FastAPI, Request
-    from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from backend.app.core.config import settings
+from backend.app.core.logging import logger
+from backend.app.core.exceptions import register_exception_handlers
+from backend.app.api.v1.router import api_v1_router
+from backend.app.api.v1.endpoints import health
 
-    fallback_app = FastAPI(title="MailSentinel Error Gateway")
 
-    @fallback_app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"])
-    async def fallback_route(request: Request, path: str):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "message": "MailSentinel FastAPI initialization failed on Vercel",
-                "path": path,
-                "detail": str(init_exc),
-                "traceback": tb_str.splitlines()[-15:],
-            },
-        )
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI):
+    """Lifespan context ensuring database tables are ready without blocking."""
+    try:
+        from backend.app.db.session import init_db
+        await init_db()
+    except Exception as exc:
+        logger.warning("Database initialization deferred on serverless startup: %s", exc)
+    yield
 
-    app = fallback_app
-    handler = fallback_app
+
+# Explicit top-level FastAPI instantiation for Vercel AST detection
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    description="MailSentinel AI Serverless Engine",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    lifespan=lifespan
+)
+
+# Register custom exception handlers
+register_exception_handlers(app)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount health routes
+app.include_router(health.router)
+app.include_router(health.router, prefix="/api")
+app.include_router(health.router, prefix="/api/v1")
+
+# Mount Master API v1 router under both /api/v1 and /v1
+app.include_router(api_v1_router, prefix="/api/v1")
+app.include_router(api_v1_router, prefix="/v1")
+
+
+@app.get("/ping", tags=["Root"])
+@app.get("/api/ping", tags=["Root"])
+@app.get("/api/v1/ping", tags=["Root"])
+async def ping():
+    return {"status": "ok", "app": settings.PROJECT_NAME}
+
+
+@app.get("/", tags=["Root"])
+@app.get("/api", tags=["Root"])
+async def root():
+    return {
+        "name": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "status": "online",
+        "health": "/api/v1/health",
+        "api_v1": "/api/v1"
+    }
+
+handler = app
