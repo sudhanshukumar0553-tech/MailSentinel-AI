@@ -9,11 +9,7 @@
       "destination": "/api/ping.py"
     },
     {
-      "source": "/api/test_path/:path*",
-      "destination": "/api/ping.py"
-    },
-    {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "destination": "/api/index.py"
     },
     {
