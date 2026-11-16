@@ -9,6 +9,10 @@
       "destination": "/api/ping.py"
     },
     {
+      "source": "/api/test_path/:path*",
+      "destination": "/api/ping.py"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.py"
     },
