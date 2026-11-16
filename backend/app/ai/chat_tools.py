@@ -11,7 +11,12 @@ Specialized tools for the interactive Cyber SOC Assistant:
 import json
 import re
 from typing import Dict, Any, List
-from smolagents import tool
+try:
+    from smolagents import tool
+except ImportError:
+    # Resilient fallback decorator if smolagents is unavailable
+    def tool(func):
+        return func
 from backend.app.ml.models import SpamClassifier, PhishingClassifier
 from backend.app.services.url_analyzer import analyze_email_urls
 from backend.app.services.risk_engine import calculate_unified_risk

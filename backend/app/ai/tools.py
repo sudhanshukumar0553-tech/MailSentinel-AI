@@ -11,7 +11,12 @@ The 6 mandated tools for the autonomous SOC investigation agent:
 """
 
 import json
-from smolagents import tool
+try:
+    from smolagents import tool
+except ImportError:
+    # Resilient fallback decorator if smolagents is unavailable
+    def tool(func):
+        return func
 from backend.app.ml.models import SpamClassifier, PhishingClassifier
 from backend.app.services.url_analyzer import analyze_email_urls
 from backend.app.services.header_analyzer import analyze_email_headers

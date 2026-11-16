@@ -79,7 +79,11 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         if "sqlite" in settings.DATABASE_URL:
             try:
-                await conn.execute(text("PRAGMA journal_mode=WAL;"))
+                import os
+                if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+                    await conn.execute(text("PRAGMA journal_mode=MEMORY;"))
+                else:
+                    await conn.execute(text("PRAGMA journal_mode=WAL;"))
                 await conn.execute(text("PRAGMA busy_timeout=30000;"))
             except Exception:
                 pass

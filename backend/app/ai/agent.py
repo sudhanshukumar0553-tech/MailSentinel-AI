@@ -12,8 +12,11 @@ High-performance cybersecurity reasoning agent combining:
 import json
 import time
 import asyncio
-from typing import Any, Dict, List, AsyncGenerator
-from smolagents import ToolCallingAgent
+from typing import Any, Dict, List, AsyncGenerator, Optional
+try:
+    from smolagents import ToolCallingAgent
+except ImportError:
+    ToolCallingAgent = None
 
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
@@ -31,12 +34,17 @@ from backend.app.ai.tools import (
 from backend.app.ai.prompts import AGENT_SYSTEM_PROMPT, format_agent_investigation_prompt
 
 
-def create_tool_calling_agent() -> ToolCallingAgent:
+def create_tool_calling_agent() -> Optional[Any]:
     """
     Creates an instance of smolagents.ToolCallingAgent configured
     with the 6 cybersecurity tools and max_steps=5.
     """
+    if ToolCallingAgent is None:
+        logger.info("smolagents not installed; ToolCallingAgent unavailable.")
+        return None
     model = get_inference_model()
+    if model is None:
+        return None
     agent = ToolCallingAgent(
         tools=ALL_SECURITY_TOOLS,
         model=model,

@@ -121,13 +121,34 @@ class Settings(BaseSettings):
     @classmethod
     def resolve_database_url(cls, v: str) -> str:
         """
-        Ensures SQLite database file paths resolve deterministically to PROJECT_ROOT
-        regardless of process current working directory (CWD).
+        Ensures SQLite database file paths resolve deterministically.
+        In serverless environments (Vercel / AWS Lambda), routes database to writable /tmp.
+        In standard environments, resolves relative paths against PROJECT_ROOT.
         """
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        if is_serverless and "sqlite" in v:
+            import tempfile
+            import shutil
+            tmp_dir = Path(tempfile.gettempdir())
+            tmp_db = tmp_dir / "mailsentinel.db"
+            if not tmp_db.exists():
+                seed_db = PROJECT_ROOT / "mailsentinel.db"
+                if seed_db.exists():
+                    try:
+                        shutil.copy2(seed_db, tmp_db)
+                    except Exception:
+                        pass
+            posix_path = tmp_db.as_posix()
+            if not posix_path.startswith("/"):
+                posix_path = f"/{posix_path}"
+            return f"sqlite+aiosqlite://{posix_path}"
+
         if v.startswith("sqlite+aiosqlite:///./") or v.startswith("sqlite+aiosqlite:////./"):
             rel_file = v.replace("sqlite+aiosqlite:////./", "").replace("sqlite+aiosqlite:///./", "")
             abs_file = (PROJECT_ROOT / rel_file).resolve().as_posix()
-            return f"sqlite+aiosqlite:///{abs_file}"
+            if not abs_file.startswith("/"):
+                abs_file = f"/{abs_file}"
+            return f"sqlite+aiosqlite://{abs_file}"
         return v
 
     @property
