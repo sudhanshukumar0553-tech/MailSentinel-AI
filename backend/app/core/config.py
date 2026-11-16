@@ -82,6 +82,7 @@ class Settings(BaseSettings):
 
     # CORS Origins (Frontend domains permitted to talk to backend API)
     CORS_ORIGINS: Union[str, List[str]] = [
+        "https://mailsentinel-ai-sigma.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173"
@@ -141,7 +142,7 @@ class Settings(BaseSettings):
             posix_path = tmp_db.as_posix()
             if not posix_path.startswith("/"):
                 posix_path = f"/{posix_path}"
-            return f"sqlite+aiosqlite://{posix_path}"
+            return f"sqlite+aiosqlite:///{posix_path}"
 
         if v.startswith("sqlite+aiosqlite:///./") or v.startswith("sqlite+aiosqlite:////./"):
             rel_file = v.replace("sqlite+aiosqlite:////./", "").replace("sqlite+aiosqlite:///./", "")

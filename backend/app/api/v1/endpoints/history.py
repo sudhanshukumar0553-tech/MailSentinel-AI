@@ -6,6 +6,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
+from backend.app.core.logging import logger
 from backend.app.db.session import get_db
 from backend.app.db.models.scan import ScanRecord
 from backend.app.schemas.scan import ScanResponse, DetectedUrlSchema, HistoryResponse, HistoryScanItem

@@ -61,10 +61,13 @@ def create_application() -> FastAPI:
     # Include health diagnostics directly at /health, /api/health, and under /api/v1/health
     app.include_router(health.router)
     app.include_router(health.router, prefix="/api")
+    app.include_router(health.router, prefix="/api/v1")
     app.include_router(api_v1_router, prefix="/api/v1")
+    app.include_router(api_v1_router, prefix="/v1")
 
     @app.get("/ping", tags=["Root"])
     @app.get("/api/ping", tags=["Root"])
+    @app.get("/api/v1/ping", tags=["Root"])
     async def ping():
         """Ultra-fast zero-overhead health probe."""
         return {"status": "ok", "app": settings.PROJECT_NAME}

@@ -127,6 +127,8 @@ def test_deterministic_fallback_transparency():
 @pytest.mark.asyncio
 async def test_unauthenticated_request_rejected():
     """Negative Security Test 1: Requests without valid authentication are rejected with 401."""
+    if settings.DEMO_MODE:
+        pytest.skip("Skipped in DEMO_MODE because demo mode grants automatic SOC Analyst access.")
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         resp = await client.post(

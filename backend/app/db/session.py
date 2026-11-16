@@ -67,11 +67,17 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
+_DB_INITIALIZED = False
+
+
 async def init_db() -> None:
     """
     Initializes database tables defined in the ORM models.
     Called on application startup.
     """
+    global _DB_INITIALIZED
+    if _DB_INITIALIZED:
+        return
     try:
         # Import all models to ensure they are registered with Base.metadata
         import backend.app.db.models  # noqa: F401
@@ -95,6 +101,7 @@ async def init_db() -> None:
                 logger.info("Added missing 'analyst_id' column to chat_sessions table.")
             except Exception:
                 pass
+        _DB_INITIALIZED = True
         logger.info("Database tables initialized successfully.")
     except Exception as exc:
         logger.warning("Database table initialization warning (non-fatal): %s", exc)

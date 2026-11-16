@@ -13,17 +13,21 @@ router = APIRouter(tags=["Health & System"])
 
 
 @router.get("/health", status_code=status.HTTP_200_OK)
-async def check_health(db: AsyncSession = Depends(get_db)):
+async def check_health():
     """
     Returns system status, active database connectivity, and provider readiness.
     Safely reveals configuration status without exposing sensitive tokens.
+    Guaranteed to return HTTP 200 OK without crashing serverless cold starts.
     """
-    db_status = "connected"
+    db_status = "disconnected"
     try:
-        await db.execute(text("SELECT 1"))
+        from backend.app.db.session import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+            db_status = "connected"
     except Exception as exc:
-        logger.error("Database health check failed: %s", exc)
-        db_status = "disconnected"
+        logger.warning("Database health check query warning: %s", exc)
+        db_status = "degraded"
 
     return {
         "status": "healthy" if db_status == "connected" else "degraded",

@@ -5,7 +5,6 @@ Exposes the ASGI FastAPI application for Vercel's native Python runtime (@vercel
 
 import sys
 import os
-import json
 import shutil
 import tempfile
 import traceback
@@ -13,12 +12,12 @@ from pathlib import Path
 
 # Add project root and backend to sys.path so all internal modules are importable
 ROOT_DIR = Path(__file__).resolve().parent.parent
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-
 BACKEND_DIR = ROOT_DIR / "backend"
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
+
+for p in [ROOT_DIR, BACKEND_DIR, Path(os.getcwd()), Path(os.getcwd()) / "backend"]:
+    p_str = str(p)
+    if p.exists() and p_str not in sys.path:
+        sys.path.insert(0, p_str)
 
 # Vercel Serverless SQLite Compatibility Layer:
 # On Vercel, the code root (/var/task) is strictly read-only.
@@ -46,34 +45,29 @@ if is_vercel:
         posix_path = tmp_db.as_posix()
         if not posix_path.startswith("/"):
             posix_path = f"/{posix_path}"
-        os.environ["DATABASE_URL"] = f"sqlite+aiosqlite://{posix_path}"
+        os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{posix_path}"
 
 try:
     from backend.app.main import app
     handler = app
 except Exception as init_exc:
     tb_str = traceback.format_exc()
+    from fastapi import FastAPI, Request
+    from fastapi.responses import JSONResponse
 
-    async def fallback_error_app(scope, receive, send):
-        if scope["type"] == "http":
-            error_payload = json.dumps({
+    fallback_app = FastAPI(title="MailSentinel Error Gateway")
+
+    @fallback_app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"])
+    async def fallback_route(request: Request, path: str):
+        return JSONResponse(
+            status_code=500,
+            content={
                 "status": "error",
-                "detail": f"Application initialization failed: {init_exc}",
-                "traceback": tb_str
-            }).encode("utf-8")
-            await send({
-                "type": "http.response.start",
-                "status": 500,
-                "headers": [
-                    (b"content-type", b"application/json"),
-                    (b"content-length", str(len(error_payload)).encode("utf-8")),
-                    (b"access-control-allow-origin", b"*"),
-                ],
-            })
-            await send({
-                "type": "http.response.body",
-                "body": error_payload,
-            })
+                "message": "MailSentinel FastAPI initialization failed on Vercel",
+                "detail": str(init_exc),
+                "traceback": tb_str.splitlines()[-15:],
+            },
+        )
 
-    app = fallback_error_app
-    handler = fallback_error_app
+    app = fallback_app
+    handler = fallback_app
