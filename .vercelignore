@@ -1,0 +1,50 @@
+# MailSentinel AI - Vercel Deployment Ignore Rules
+# Exclude test artifacts, scratch screenshots, and unneeded assets from serverless bundle
+
+# Scratch & Screenshot artifacts
+/*.png
+scratch/
+scratch_*
+live_verification_*.png
+!frontend/src/assets/**
+
+# Tests and benchmarks
+backend/tests/
+benchmark_*.py
+benchmark_*.json
+live_integration_results.json
+test_domain_restriction.py
+
+# Python cache & virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Version control & containers
+.git/
+.gitignore
+Dockerfile
+docker-compose.yml
+render.yaml
+Procfile
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Local databases and journals
+*.db-journal
+*.db-wal
+*.db-shm
+*.log
+
+# Sensitive local environments
+.env
+.env.*
+backend/.env
+frontend/.env

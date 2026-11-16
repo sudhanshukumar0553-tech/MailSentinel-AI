@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+ENV/
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.oxlintrc.json
+
+# Environment variables & secrets (CRITICAL: NEVER COMMIT KEYS)
+.env
+.env.*
+*.env
+*.env.*
+**/.env
+**/.env.*
+frontend/.env
+frontend/.env.*
+backend/.env
+backend/.env.*
+
+# Allow environment templates
+!*.env.example
+!**/.env.example
+
+
+# Databases
+*.db
+!mailsentinel.db
+*.sqlite
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Temporary Test Artifacts, Screenshots & Scratch
+scratch/
+scratch_*
+live_verification_*.png
+*results*.json
+benchmark_*.py
+benchmark_*.json
+test_domain_restriction.py
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+

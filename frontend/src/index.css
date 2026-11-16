@@ -1,0 +1,1936 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #080D1A;
+  --bg-surface: #0E1726;
+  --bg-secondary: #0A101D;
+  --text-primary: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border-color: rgba(51, 65, 85, 0.6);
+  --accent-cyan: #06B6D4;
+  --accent-purple: #8B5CF6;
+  --accent-emerald: #10B981;
+  --glow-accent: rgba(6, 182, 212, 0.35);
+  --glow-emerald: rgba(16, 185, 129, 0.35);
+}
+
+.light {
+  --bg-primary: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-secondary: #F1F5F9;
+  --text-primary: #0F172A;
+  --text-muted: #334155;
+  --border-color: #E2E8F0;
+  --accent-cyan: #0284C7;
+  --accent-purple: #7C3AED;
+  --accent-emerald: #059669;
+  --glow-accent: rgba(2, 132, 199, 0.2);
+  --glow-emerald: rgba(5, 150, 105, 0.2);
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Smooth Theme Crossfade */
+  header, main, nav, .border, [role="button"], input, textarea, select {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+  }
+}
+
+/* Custom Cyber Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #94A3B8;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-emerald);
+}
+
+/* Premium Cybersecurity Glow & Interaction Styles */
+.cyber-glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
+}
+
+.cyber-glow-purple {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+}
+
+.cyber-glow-emerald {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+}
+
+.light .cyber-glow-emerald {
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.25);
+}
+
+.cyber-card-hover {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+}
+
+.cyber-card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.15);
+}
+
+.light .cyber-card-hover:hover {
+  box-shadow: 0 4px 15px -2px rgba(2, 132, 199, 0.12);
+}
+
+/* ML Model Evaluation Card Interactive Green Hover Glow */
+@media (hover: hover) {
+  .model-card-glow {
+    position: relative;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 250ms ease,
+                background-color 250ms ease;
+  }
+
+  .model-card-glow:hover {
+    transform: translateY(-2px);
+    border-color: rgba(52, 211, 153, 0.45) !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.12), 0 0 25px rgba(16, 185, 129, 0.08), inset 0 1px 0 rgba(52, 211, 153, 0.2) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.06), transparent 70%);
+  }
+
+  .light .model-card-glow:hover {
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.18), 0 0 20px rgba(16, 185, 129, 0.08), inset 0 1px 0 rgba(16, 185, 129, 0.15) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04), transparent 70%);
+  }
+
+  /* Dataset Card Blue Hover Glow (Primary Spam Dataset) */
+  .dataset-card-blue {
+    position: relative;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 250ms ease,
+                background-color 250ms ease;
+  }
+
+  .dataset-card-blue:hover {
+    transform: translateY(-2px);
+    border-color: rgba(96, 165, 250, 0.6) !important;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.18), 0 0 26px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(96, 165, 250, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1), transparent 70%);
+  }
+
+  .light .dataset-card-blue:hover {
+    border-color: rgba(29, 78, 216, 0.45) !important;
+    box-shadow: 0 4px 16px -2px rgba(29, 78, 216, 0.15), 0 0 20px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(59, 130, 246, 0.15) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05), transparent 70%);
+  }
+
+  /* Dataset Card Purple Hover Glow (Secondary Phishing Dataset) */
+  .dataset-card-purple {
+    position: relative;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 250ms ease,
+                background-color 250ms ease;
+  }
+
+  .dataset-card-purple:hover {
+    transform: translateY(-2px);
+    border-color: rgba(192, 132, 252, 0.6) !important;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.18), 0 0 26px rgba(168, 85, 247, 0.1), inset 0 1px 0 rgba(192, 132, 252, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.1), transparent 70%);
+  }
+
+  .light .dataset-card-purple:hover {
+    border-color: rgba(124, 58, 237, 0.45) !important;
+    box-shadow: 0 4px 16px -2px rgba(124, 58, 237, 0.15), 0 0 20px rgba(168, 85, 247, 0.08), inset 0 1px 0 rgba(168, 85, 247, 0.15) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.05), transparent 70%);
+  }
+
+  /* Threat Severity Matrix Micro-Bounce & Severity Glow */
+  .severity-card-critical:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(239, 68, 68, 0.65) !important;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.22), 0 0 30px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(239, 68, 68, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.12), transparent 70%);
+  }
+  .severity-card-critical:hover strong {
+    filter: brightness(1.2);
+  }
+
+  .light .severity-card-critical:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(239, 68, 68, 0.22), 0 0 20px rgba(239, 68, 68, 0.12) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.04), transparent 70%);
+  }
+  .light .severity-card-critical:hover strong {
+    filter: brightness(1.15);
+  }
+
+  .severity-card-dangerous:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(245, 158, 11, 0.65) !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.22), 0 0 30px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(245, 158, 11, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.12), transparent 70%);
+  }
+  .severity-card-dangerous:hover strong {
+    filter: brightness(1.2);
+  }
+
+  .light .severity-card-dangerous:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.22), 0 0 20px rgba(245, 158, 11, 0.12) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.04), transparent 70%);
+  }
+  .light .severity-card-dangerous:hover strong {
+    filter: brightness(1.15);
+  }
+
+  .severity-card-suspicious:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(249, 115, 22, 0.65) !important;
+    box-shadow: 0 0 16px rgba(249, 115, 22, 0.20), 0 0 30px rgba(249, 115, 22, 0.10), inset 0 1px 0 rgba(249, 115, 22, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.10), transparent 70%);
+  }
+  .severity-card-suspicious:hover strong {
+    filter: brightness(1.2);
+  }
+
+  .light .severity-card-suspicious:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(249, 115, 22, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(249, 115, 22, 0.20), 0 0 20px rgba(249, 115, 22, 0.10) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.04), transparent 70%);
+  }
+  .light .severity-card-suspicious:hover strong {
+    filter: brightness(1.15);
+  }
+
+  .severity-card-safe:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(16, 185, 129, 0.65) !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.20), 0 0 30px rgba(16, 185, 129, 0.10), inset 0 1px 0 rgba(16, 185, 129, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.10), transparent 70%);
+  }
+  .severity-card-safe:hover strong {
+    filter: brightness(1.2);
+  }
+
+  .light .severity-card-safe:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.20), 0 0 20px rgba(16, 185, 129, 0.10) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04), transparent 70%);
+  }
+  .light .severity-card-safe:hover strong {
+    filter: brightness(1.15);
+  }
+
+  /* Dual-Engine Telemetry Container Hover Elevation */
+  .telemetry-container-glow:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 4px 20px -2px rgba(168, 85, 247, 0.16), 0 0 25px rgba(139, 92, 246, 0.08) !important;
+  }
+
+  .light .telemetry-container-glow:hover {
+    transform: translateY(-2px);
+    border-color: rgba(124, 58, 237, 0.35) !important;
+    box-shadow: 0 4px 16px -2px rgba(124, 58, 237, 0.12), 0 0 15px rgba(124, 58, 237, 0.06) !important;
+  }
+
+  /* Spam Likelihood Card Cyan Glow & Micro-Elevation */
+  .telemetry-card-spam:hover {
+    transform: translateY(-2px);
+    border-color: rgba(6, 182, 212, 0.6) !important;
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.22), 0 0 30px rgba(6, 182, 212, 0.12), inset 0 1px 0 rgba(6, 182, 212, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.08), transparent 70%);
+  }
+
+  .light .telemetry-card-spam:hover {
+    transform: translateY(-2px);
+    border-color: rgba(2, 132, 199, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.18), 0 0 20px rgba(2, 132, 199, 0.08) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.04), transparent 70%);
+  }
+
+  /* Phishing Card Amber Glow & Micro-Elevation */
+  .telemetry-card-phish:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.6) !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.22), 0 0 30px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(245, 158, 11, 0.25) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08), transparent 70%);
+  }
+
+  .light .telemetry-card-phish:hover {
+    transform: translateY(-2px);
+    border-color: rgba(217, 119, 6, 0.5) !important;
+    box-shadow: 0 4px 16px -2px rgba(217, 119, 6, 0.18), 0 0 20px rgba(217, 119, 6, 0.08) !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.04), transparent 70%);
+  }
+
+  /* URL Threat Intelligence Container Hover Elevation */
+  .url-threat-container-glow:hover {
+    transform: translateY(-3px);
+    border-color: rgba(6, 182, 212, 0.45) !important;
+    box-shadow: 0 6px 24px -2px rgba(6, 182, 212, 0.18), 0 0 20px rgba(14, 165, 233, 0.10) !important;
+  }
+
+  .light .url-threat-container-glow:hover {
+    transform: translateY(-3px);
+    border-color: rgba(2, 132, 199, 0.35) !important;
+    box-shadow: 0 6px 20px -2px rgba(2, 132, 199, 0.14), 0 0 16px rgba(14, 165, 233, 0.08) !important;
+  }
+
+  /* Individual URL Result Card Hover */
+  .url-threat-card-glow:hover {
+    transform: translateY(-2px);
+    border-color: rgba(6, 182, 212, 0.5) !important;
+    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.16) !important;
+  }
+
+  .light .url-threat-card-glow:hover {
+    transform: translateY(-2px);
+    border-color: rgba(2, 132, 199, 0.45) !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12) !important;
+  }
+}
+
+/* URL Threat Intelligence Base Styles */
+.url-threat-container-glow {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease;
+}
+
+.url-threat-card-glow {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transform-origin: center;
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 250ms ease,
+              background-color 250ms ease;
+}
+
+/* Dual-Engine ML Telemetry Base Styles */
+.telemetry-container-glow {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease;
+}
+
+.telemetry-card-spam,
+.telemetry-card-phish {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transform-origin: center;
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 250ms ease,
+              background-color 250ms ease;
+}
+
+/* Progress Bar Aura Animations */
+.progress-bar-aura-spam {
+  position: relative;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.45), 0 0 22px rgba(59, 130, 246, 0.25);
+}
+.progress-bar-aura-spam::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 5px;
+  background: #E0F2FE;
+  border-radius: 9999px;
+  box-shadow: 0 0 8px #38BDF8, 0 0 14px #0284C7;
+  opacity: 0.95;
+}
+
+.progress-bar-aura-phish {
+  position: relative;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.45), 0 0 22px rgba(249, 115, 22, 0.25);
+}
+.progress-bar-aura-phish::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 5px;
+  background: #FEF3C7;
+  border-radius: 9999px;
+  box-shadow: 0 0 8px #FBBF24, 0 0 14px #D97706;
+  opacity: 0.95;
+}
+
+/* Threat Severity Matrix Base Card Transition */
+.severity-card {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 250ms ease,
+              background-color 250ms ease,
+              filter 250ms ease;
+}
+
+.severity-card strong {
+  transition: filter 250ms ease, color 250ms ease;
+}
+
+/* Message Fade In Animation */
+@keyframes messageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-message-fade-in {
+  animation: messageFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Page Transition Animation */
+@keyframes pageSlideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageSlideFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Active Navigation Glow */
+.nav-active-glow-dark {
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.28), inset 0 0 8px rgba(59, 130, 246, 0.15);
+}
+
+.nav-active-glow-light {
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.18), inset 0 0 6px rgba(14, 165, 233, 0.08);
+}
+
+/* Pulse Animation for Live Status */
+@keyframes cyber-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+.animate-cyber-pulse {
+  animation: cyber-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ==========================================================================
+   MailSentinel Phase 4.3 — SOC Assessment Aurora Motion System
+   OxygenOS-inspired spring bounce, micro-interactions & aurora glows
+   ========================================================================== */
+
+/* 1. Base Styles & Spring Transitions */
+.soc-threat-card {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+}
+
+.soc-threat-card:active {
+  transform: scale(0.985) !important;
+  transition: transform 100ms ease !important;
+}
+
+.soc-report-container {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+}
+
+.soc-report-action {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 220ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 220ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+}
+
+.soc-report-action svg {
+  transition: transform 220ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+/* 2. Interactive Hovers (Desktop with fine pointer) */
+@media (hover: hover) and (pointer: fine) {
+  /* Report Container Aurora Glow */
+  .soc-report-container:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 6px 25px -3px rgba(168, 85, 247, 0.20), 0 0 20px rgba(6, 182, 212, 0.12) !important;
+  }
+
+  .light .soc-report-container:hover {
+    transform: translateY(-2px);
+    border-color: rgba(147, 51, 234, 0.35) !important;
+    box-shadow: 0 6px 20px -3px rgba(147, 51, 234, 0.14), 0 0 16px rgba(14, 165, 233, 0.08) !important;
+  }
+
+  /* Suspicious Threat Card Aurora Hover Effects */
+  .soc-threat-card-malicious:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    box-shadow: 0 8px 30px -4px rgba(239, 68, 68, 0.25), 0 0 25px rgba(244, 63, 94, 0.14) !important;
+  }
+
+  .light .soc-threat-card-malicious:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(220, 38, 38, 0.45) !important;
+    box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.18), 0 0 20px rgba(239, 68, 68, 0.10) !important;
+  }
+
+  .soc-threat-card-suspicious:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(245, 158, 11, 0.55) !important;
+    box-shadow: 0 8px 30px -4px rgba(245, 158, 11, 0.25), 0 0 25px rgba(217, 119, 6, 0.14) !important;
+  }
+
+  .light .soc-threat-card-suspicious:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(217, 119, 6, 0.45) !important;
+    box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.18), 0 0 20px rgba(245, 158, 11, 0.10) !important;
+  }
+
+  .soc-threat-card-clean:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    box-shadow: 0 8px 30px -4px rgba(16, 185, 129, 0.25), 0 0 25px rgba(5, 150, 105, 0.14) !important;
+  }
+
+  .light .soc-threat-card-clean:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(5, 150, 105, 0.45) !important;
+    box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.18), 0 0 20px rgba(16, 185, 129, 0.10) !important;
+  }
+
+  .soc-threat-card-unknown:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(99, 102, 241, 0.5) !important;
+    box-shadow: 0 8px 30px -4px rgba(99, 102, 241, 0.20), 0 0 25px rgba(79, 70, 229, 0.12) !important;
+  }
+
+  .light .soc-threat-card-unknown:hover {
+    transform: translateY(-3.5px) scale(1.002);
+    border-color: rgba(79, 70, 229, 0.4) !important;
+    box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.14), 0 0 20px rgba(99, 102, 241, 0.08) !important;
+  }
+
+  /* Action Buttons Hover & Phase 4.4 Multicolor Identity */
+  .soc-report-action:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25), 0 0 10px rgba(6, 182, 212, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+  }
+
+  .soc-report-action:hover svg {
+    transform: translateY(-1px);
+  }
+
+  .light .soc-report-action:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.18), 0 0 8px rgba(2, 132, 199, 0.10) !important;
+    border-color: rgba(147, 51, 234, 0.4) !important;
+  }
+
+  /* Phase 4.4 Distinct Action Button Hover & Aurora Glows */
+  .soc-btn-copy:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.70) !important;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.32), 0 0 12px rgba(6, 182, 212, 0.22) !important;
+  }
+  .soc-btn-copy:hover svg {
+    transform: translateY(-1px) scale(1.08);
+  }
+  .light .soc-btn-copy:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: #38BDF8 !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.22), 0 0 10px rgba(6, 182, 212, 0.14) !important;
+  }
+
+  .soc-btn-print:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: rgba(168, 85, 247, 0.70) !important;
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.32), 0 0 12px rgba(147, 51, 234, 0.22) !important;
+  }
+  .soc-btn-print:hover svg {
+    transform: translateY(-1.5px);
+  }
+  .light .soc-btn-print:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: #A855F7 !important;
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.22), 0 0 10px rgba(147, 51, 234, 0.14) !important;
+  }
+
+  .soc-btn-export:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.70) !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.32), 0 0 12px rgba(20, 184, 166, 0.22) !important;
+  }
+  .soc-btn-export:hover svg {
+    transform: translateY(1.5px);
+  }
+  .light .soc-btn-export:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: #10B981 !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.22), 0 0 10px rgba(20, 184, 166, 0.14) !important;
+  }
+
+  .soc-btn-toggle:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.70) !important;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.32), 0 0 12px rgba(249, 115, 22, 0.22) !important;
+  }
+  .light .soc-btn-toggle:hover {
+    transform: scale(1.03) translateY(-2px);
+    border-color: #F59E0B !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.22), 0 0 10px rgba(249, 115, 22, 0.14) !important;
+  }
+
+  /* Phase 4.4 Forensic Narrative Hover Aurora */
+  .soc-forensic-narrative:hover {
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.50) !important;
+    box-shadow: 0 8px 30px -4px rgba(16, 185, 129, 0.22), 0 0 22px rgba(6, 182, 212, 0.14), inset 0 1px 0 rgba(52, 211, 153, 0.15) !important;
+  }
+  .light .soc-forensic-narrative:hover {
+    transform: translateY(-3px);
+    border-color: rgba(5, 150, 105, 0.45) !important;
+    box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.16), 0 0 18px rgba(14, 165, 233, 0.10) !important;
+  }
+  .soc-forensic-narrative:hover .soc-narrative-icon {
+    transform: scale(1.14) rotate(-4deg);
+  }
+
+  /* Phase 4.4 Tool Execution Timeline Aurora & Step Hovers */
+  .soc-timeline-container:hover {
+    transform: translateY(-2px);
+    border-color: rgba(139, 92, 246, 0.45) !important;
+    box-shadow: 0 8px 30px -4px rgba(139, 92, 246, 0.22), 0 0 20px rgba(6, 182, 212, 0.12) !important;
+  }
+  .light .soc-timeline-container:hover {
+    transform: translateY(-2px);
+    border-color: rgba(124, 58, 237, 0.40) !important;
+    box-shadow: 0 8px 24px -4px rgba(139, 92, 246, 0.15), 0 0 16px rgba(14, 165, 233, 0.08) !important;
+  }
+
+  .soc-timeline-step:hover .soc-step-badge {
+    transform: scale(1.08);
+  }
+
+  .soc-timeline-step-success:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.20), 0 0 12px rgba(5, 150, 105, 0.12) !important;
+  }
+  .light .soc-timeline-step-success:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(5, 150, 105, 0.45) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.14) !important;
+  }
+
+  .soc-timeline-step-warning:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(245, 158, 11, 0.55) !important;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.22), 0 0 12px rgba(217, 119, 6, 0.14) !important;
+  }
+  .light .soc-timeline-step-warning:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(217, 119, 6, 0.45) !important;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15) !important;
+  }
+
+  .soc-timeline-step-failed:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.22), 0 0 12px rgba(220, 38, 38, 0.14) !important;
+  }
+  .light .soc-timeline-step-failed:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(220, 38, 38, 0.45) !important;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15) !important;
+  }
+
+  .soc-timeline-step-running:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(6, 182, 212, 0.55) !important;
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.22) !important;
+  }
+  .light .soc-timeline-step-running:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(14, 165, 233, 0.45) !important;
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.15) !important;
+  }
+}
+
+/* 3. Button Active and Multicolor Focus States */
+.soc-report-action:active {
+  transform: scale(0.97) !important;
+  transition: transform 80ms ease !important;
+}
+
+.soc-report-action:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(14, 23, 38, 0.9), 0 0 0 4px rgba(168, 85, 247, 0.6) !important;
+}
+
+.light .soc-report-action:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(147, 51, 234, 0.5) !important;
+}
+
+/* Phase 4.4 Button Color Identity & Focus States */
+.soc-btn-copy {
+  background-color: rgba(14, 165, 233, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38BDF8;
+}
+.light .soc-btn-copy {
+  background-color: #F0F9FF;
+  border-color: #BAE6FD;
+  color: #0369A1;
+}
+.soc-btn-copy:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(14, 23, 38, 0.9), 0 0 0 4px rgba(56, 189, 248, 0.6) !important;
+}
+.light .soc-btn-copy:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(14, 165, 233, 0.6) !important;
+}
+
+.soc-btn-print {
+  background-color: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #C084FC;
+}
+.light .soc-btn-print {
+  background-color: #FAF5FF;
+  border-color: #E9D5FF;
+  color: #6B21A8;
+}
+.soc-btn-print:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(14, 23, 38, 0.9), 0 0 0 4px rgba(168, 85, 247, 0.6) !important;
+}
+.light .soc-btn-print:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(147, 51, 234, 0.6) !important;
+}
+
+.soc-btn-export {
+  background-color: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34D399;
+}
+.light .soc-btn-export {
+  background-color: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #047857;
+}
+.soc-btn-export:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(14, 23, 38, 0.9), 0 0 0 4px rgba(16, 185, 129, 0.6) !important;
+}
+.light .soc-btn-export:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(16, 185, 129, 0.6) !important;
+}
+
+.soc-btn-toggle {
+  background-color: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #FBBF24;
+}
+.light .soc-btn-toggle {
+  background-color: #FFFBEB;
+  border-color: #FDE68A;
+  color: #B45309;
+}
+.soc-btn-toggle:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(14, 23, 38, 0.9), 0 0 0 4px rgba(245, 158, 11, 0.6) !important;
+}
+.light .soc-btn-toggle:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(245, 158, 11, 0.6) !important;
+}
+
+/* Phase 4.4 Base Container Transitions */
+.soc-forensic-narrative {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+}
+
+.soc-narrative-icon {
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.soc-timeline-container {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+}
+
+.soc-timeline-step {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0);
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 250ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 250ms ease,
+              background-color 250ms ease;
+}
+
+.soc-step-badge {
+  transition: transform 220ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+/* 4. Score Circular Gauge Glow */
+.soc-score-gauge-malicious {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));
+}
+.soc-score-gauge-suspicious {
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45));
+}
+.soc-score-gauge-clean {
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.45));
+}
+.soc-score-gauge-unknown {
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.45));
+}
+
+/* 5. Restrained Threat Verdict Pulse */
+@keyframes socVerdictPulseMalicious {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(239, 68, 68, 0.35);
+  }
+}
+
+@keyframes socVerdictPulseSuspicious {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.35);
+  }
+}
+
+@keyframes socVerdictPulseClean {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(16, 185, 129, 0.35);
+  }
+}
+
+@keyframes socVerdictPulseUnknown {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(99, 102, 241, 0.35);
+  }
+}
+
+.soc-verdict-pulse-malicious {
+  animation: socVerdictPulseMalicious 3s ease-in-out infinite;
+}
+.soc-verdict-pulse-suspicious {
+  animation: socVerdictPulseSuspicious 3s ease-in-out infinite;
+}
+.soc-verdict-pulse-clean {
+  animation: socVerdictPulseClean 3s ease-in-out infinite;
+}
+.soc-verdict-pulse-unknown {
+  animation: socVerdictPulseUnknown 3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   MailSentinel Phase 4.6 — Interactive Navigation & Soft Aurora Motion Upgrade
+   ========================================================================== */
+
+/* 1. Investigation Tab Switching */
+.investigation-nav-tab {
+  position: relative;
+  will-change: transform, box-shadow, border-color, background;
+  transform: scale(1);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 250ms ease,
+              background 250ms ease,
+              color 250ms ease;
+}
+
+.investigation-nav-tab svg {
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.investigation-nav-tab-active {
+  transform: scale(1.04);
+}
+
+.investigation-nav-tab-active svg {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+.investigation-nav-tab-email-active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.95), rgba(37, 99, 235, 0.95)) !important;
+  border-color: rgba(34, 211, 238, 0.6) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.40), 0 0 15px rgba(59, 130, 246, 0.25) !important;
+}
+
+.investigation-nav-tab-url-active {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.95), rgba(79, 70, 229, 0.95)) !important;
+  border-color: rgba(192, 132, 252, 0.6) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 20px -2px rgba(147, 51, 234, 0.40), 0 0 15px rgba(99, 102, 241, 0.25) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .investigation-nav-tab:not(.investigation-nav-tab-active):hover {
+    transform: scale(1.02) translateY(-1px);
+  }
+  .investigation-nav-tab:not(.investigation-nav-tab-active):hover svg {
+    transform: scale(1.08) rotate(-4deg);
+  }
+}
+
+/* Tab indicator line */
+.investigation-tab-indicator {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3px;
+  border-radius: 9999px;
+  transition: all 300ms cubic-bezier(0.34, 1.25, 0.64, 1);
+  pointer-events: none;
+}
+
+.investigation-tab-indicator-email {
+  width: 65%;
+  background: linear-gradient(90deg, #22D3EE, #3B82F6);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.8), 0 0 4px rgba(59, 130, 246, 0.6);
+}
+
+.investigation-tab-indicator-url {
+  width: 65%;
+  background: linear-gradient(90deg, #C084FC, #818CF8);
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.8), 0 0 4px rgba(129, 140, 248, 0.6);
+}
+
+/* Panel content entrance transition */
+.investigation-panel-enter {
+  animation: panelSlideFade 350ms cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
+}
+
+@keyframes panelSlideFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. URL Anatomy & Patterns — Soft Pastel Aurora */
+.url-anatomy-card {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+  animation: softSpringBounce 400ms cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
+  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.12), 0 0 14px rgba(45, 212, 191, 0.08);
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
+.light .url-anatomy-card {
+  background-color: #F8FAFC;
+  border-color: #BAE6FD;
+  box-shadow: 0 4px 16px -2px rgba(6, 182, 212, 0.10), 0 0 10px rgba(14, 165, 233, 0.06);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .url-anatomy-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: rgba(34, 211, 238, 0.65) !important;
+    box-shadow: 0 8px 30px -4px rgba(6, 182, 212, 0.25), 0 0 22px rgba(56, 189, 248, 0.18), inset 0 1px 0 rgba(45, 212, 191, 0.15) !important;
+  }
+  .light .url-anatomy-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: #38BDF8 !important;
+    box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.18), 0 0 16px rgba(14, 165, 233, 0.12) !important;
+  }
+  .url-anatomy-card:hover .url-anatomy-icon {
+    transform: scale(1.15) rotate(-6deg);
+  }
+}
+
+.url-anatomy-icon {
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+/* 3. TLS Certificate & Network Transport — Soft Violet Aurora */
+.url-tls-card {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background-color 300ms ease;
+  animation: softSpringRise 450ms cubic-bezier(0.34, 1.25, 0.64, 1) 100ms backwards;
+  box-shadow: 0 4px 20px -2px rgba(168, 85, 247, 0.12), 0 0 14px rgba(129, 140, 248, 0.08);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.light .url-tls-card {
+  background-color: #F8FAFC;
+  border-color: #DDD6FE;
+  box-shadow: 0 4px 16px -2px rgba(147, 51, 234, 0.10), 0 0 10px rgba(168, 85, 247, 0.06);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .url-tls-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: rgba(192, 132, 252, 0.65) !important;
+    box-shadow: 0 8px 30px -4px rgba(168, 85, 247, 0.25), 0 0 22px rgba(129, 140, 248, 0.18), inset 0 1px 0 rgba(192, 132, 252, 0.15) !important;
+  }
+  .light .url-tls-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: #A855F7 !important;
+    box-shadow: 0 8px 24px -4px rgba(147, 51, 234, 0.18), 0 0 16px rgba(168, 85, 247, 0.12) !important;
+  }
+  .url-tls-card:hover .url-tls-icon {
+    transform: scale(1.15) rotate(6deg);
+  }
+}
+
+.url-tls-icon {
+  transition: transform 250ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+/* Keyframes for Staggered Entrance */
+@keyframes softSpringBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes softSpringRise {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-1.5px) scale(1.003);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Phase 4.7: Interactive Security Audit & URL Anatomy Motion Upgrade
+   ========================================================================== */
+
+/* 1. URL Anatomy & Patterns — Individual Bouncy Information Rows */
+.url-anatomy-row {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 280ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 280ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+  animation: anatomyRowEntrance 360ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+}
+
+@keyframes anatomyRowEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-1.5px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.url-row-delay-0 { animation-delay: 30ms; }
+.url-row-delay-1 { animation-delay: 70ms; }
+.url-row-delay-2 { animation-delay: 110ms; }
+.url-row-delay-3 { animation-delay: 150ms; }
+.url-row-delay-4 { animation-delay: 190ms; }
+.url-row-delay-5 { animation-delay: 230ms; }
+.url-row-delay-6 { animation-delay: 270ms; }
+
+.url-row-icon {
+  transition: transform 260ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.url-row-badge {
+  animation: valueBadgePop 340ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+}
+
+@keyframes valueBadgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Individual Row Identities on Hover */
+@media (hover: hover) and (pointer: fine) {
+  .url-anatomy-row:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+  .url-anatomy-row:hover .url-row-icon {
+    transform: scale(1.22) rotate(8deg);
+  }
+
+  /* Registered Domain: Sky Blue / Cyan */
+  .url-row-domain:hover {
+    border-color: rgba(6, 182, 212, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(6, 182, 212, 0.28) !important;
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.12) 0%, rgba(14, 165, 233, 0.05) 100%) !important;
+  }
+  .light .url-row-domain:hover {
+    border-color: #06B6D4 !important;
+    box-shadow: 0 4px 12px -2px rgba(6, 182, 212, 0.20) !important;
+    background: linear-gradient(90deg, #ECFEFF 0%, #F0F9FF 100%) !important;
+  }
+
+  /* Subdomain: Turquoise / Teal */
+  .url-row-subdomain:hover {
+    border-color: rgba(20, 184, 166, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(20, 184, 166, 0.28) !important;
+    background: linear-gradient(90deg, rgba(20, 184, 166, 0.12) 0%, rgba(45, 212, 191, 0.05) 100%) !important;
+  }
+  .light .url-row-subdomain:hover {
+    border-color: #14B8A6 !important;
+    box-shadow: 0 4px 12px -2px rgba(20, 184, 166, 0.20) !important;
+    background: linear-gradient(90deg, #F0FDFA 0%, #CCFBF1 100%) !important;
+  }
+
+  /* TLD: Soft Violet */
+  .url-row-tld:hover {
+    border-color: rgba(168, 85, 247, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(168, 85, 247, 0.28) !important;
+    background: linear-gradient(90deg, rgba(168, 85, 247, 0.12) 0%, rgba(192, 132, 252, 0.05) 100%) !important;
+  }
+  .light .url-row-tld:hover {
+    border-color: #A855F7 !important;
+    box-shadow: 0 4px 12px -2px rgba(168, 85, 247, 0.20) !important;
+    background: linear-gradient(90deg, #FAF5FF 0%, #F3E8FF 100%) !important;
+  }
+
+  /* Shannon Entropy: Electric Blue */
+  .url-row-entropy:hover {
+    border-color: rgba(59, 130, 246, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(59, 130, 246, 0.28) !important;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.12) 0%, rgba(96, 165, 250, 0.05) 100%) !important;
+  }
+  .light .url-row-entropy:hover {
+    border-color: #3B82F6 !important;
+    box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.20) !important;
+    background: linear-gradient(90deg, #EFF6FF 0%, #DBEAFE 100%) !important;
+  }
+
+  /* Defanged Syntax: Amber */
+  .url-row-defanged:hover {
+    border-color: rgba(245, 158, 11, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.28) !important;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(251, 191, 36, 0.05) 100%) !important;
+  }
+  .light .url-row-defanged:hover {
+    border-color: #F59E0B !important;
+    box-shadow: 0 4px 12px -2px rgba(245, 158, 11, 0.20) !important;
+    background: linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+  }
+
+  /* Safely Normalized: Indigo */
+  .url-row-normalized:hover {
+    border-color: rgba(99, 102, 241, 0.55) !important;
+    box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.28) !important;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, rgba(129, 140, 248, 0.05) 100%) !important;
+  }
+  .light .url-row-normalized:hover {
+    border-color: #6366F1 !important;
+    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.20) !important;
+    background: linear-gradient(90deg, #EEF2FF 0%, #E0E7FF 100%) !important;
+  }
+}
+
+/* 2. Security Inspection Checks Audit — Multicolor Interactive Cards */
+.security-audit-card {
+  position: relative;
+  will-change: transform, box-shadow, border-color;
+  transform: translateY(0) scale(1);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 300ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 240ms ease,
+              background-color 240ms ease;
+  animation: auditCardEntrance 420ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+  cursor: pointer;
+}
+
+@keyframes auditCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.004);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.audit-delay-0 { animation-delay: 40ms; }
+.audit-delay-1 { animation-delay: 80ms; }
+.audit-delay-2 { animation-delay: 120ms; }
+.audit-delay-3 { animation-delay: 160ms; }
+.audit-delay-4 { animation-delay: 200ms; }
+.audit-delay-5 { animation-delay: 240ms; }
+.audit-delay-6 { animation-delay: 280ms; }
+
+.audit-card-icon {
+  transition: transform 260ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.security-audit-card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Audit Card Identities */
+/* 1. DNS Resolution — Electric Blue / Cyan */
+.audit-card-dns {
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(6, 182, 212, 0.12);
+}
+.light .audit-card-dns {
+  border-color: #BAE6FD;
+  box-shadow: 0 3px 12px -2px rgba(14, 165, 233, 0.08);
+}
+
+/* 2. SSRF Protection — Royal Purple / Violet */
+.audit-card-ssrf {
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(168, 85, 247, 0.12);
+}
+.light .audit-card-ssrf {
+  border-color: #E9D5FF;
+  box-shadow: 0 3px 12px -2px rgba(168, 85, 247, 0.08);
+}
+
+/* 3. Lexical Heuristics — Emerald Green / Teal */
+.audit-card-heuristics {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.12);
+}
+.light .audit-card-heuristics {
+  border-color: #A7F3D0;
+  box-shadow: 0 3px 12px -2px rgba(16, 185, 129, 0.08);
+}
+
+/* 4. TLS Certificate — Sky Blue / Indigo */
+.audit-card-tls {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(99, 102, 241, 0.12);
+}
+.light .audit-card-tls {
+  border-color: #C7D2FE;
+  box-shadow: 0 3px 12px -2px rgba(99, 102, 241, 0.08);
+}
+
+/* 5. Redirect Tracing — Amber / Orange */
+.audit-card-redirect {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.12);
+}
+.light .audit-card-redirect {
+  border-color: #FDE68A;
+  box-shadow: 0 3px 12px -2px rgba(245, 158, 11, 0.08);
+}
+
+/* 6. External Reputation — Magenta / Pink */
+.audit-card-reputation {
+  border-color: rgba(236, 72, 153, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(236, 72, 153, 0.12);
+}
+.light .audit-card-reputation {
+  border-color: #FBCFE8;
+  box-shadow: 0 3px 12px -2px rgba(236, 72, 153, 0.08);
+}
+
+/* 7. AI Forensics — Cyan / Purple */
+.audit-card-aiforensics {
+  border-color: rgba(147, 51, 234, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(147, 51, 234, 0.12), 0 0 10px rgba(6, 182, 212, 0.08);
+}
+.light .audit-card-aiforensics {
+  border-color: #DDD6FE;
+  box-shadow: 0 3px 12px -2px rgba(147, 51, 234, 0.08);
+}
+
+/* Card Hover Interactions */
+@media (hover: hover) and (pointer: fine) {
+  .security-audit-card:hover {
+    transform: translateY(-3px) scale(1.015);
+  }
+  .security-audit-card:hover .audit-card-icon {
+    transform: scale(1.2) rotate(6deg);
+  }
+
+  .audit-card-dns:hover {
+    border-color: rgba(6, 182, 212, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(6, 182, 212, 0.26), 0 0 14px rgba(14, 165, 233, 0.16) !important;
+  }
+  .light .audit-card-dns:hover {
+    border-color: #06B6D4 !important;
+    box-shadow: 0 8px 20px -3px rgba(6, 182, 212, 0.18) !important;
+  }
+
+  .audit-card-ssrf:hover {
+    border-color: rgba(168, 85, 247, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(168, 85, 247, 0.26), 0 0 14px rgba(139, 92, 246, 0.16) !important;
+  }
+  .light .audit-card-ssrf:hover {
+    border-color: #A855F7 !important;
+    box-shadow: 0 8px 20px -3px rgba(168, 85, 247, 0.18) !important;
+  }
+
+  .audit-card-heuristics:hover {
+    border-color: rgba(16, 185, 129, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(16, 185, 129, 0.26), 0 0 14px rgba(20, 184, 166, 0.16) !important;
+  }
+  .light .audit-card-heuristics:hover {
+    border-color: #10B981 !important;
+    box-shadow: 0 8px 20px -3px rgba(16, 185, 129, 0.18) !important;
+  }
+
+  .audit-card-tls:hover {
+    border-color: rgba(99, 102, 241, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(99, 102, 241, 0.26), 0 0 14px rgba(14, 165, 233, 0.16) !important;
+  }
+  .light .audit-card-tls:hover {
+    border-color: #6366F1 !important;
+    box-shadow: 0 8px 20px -3px rgba(99, 102, 241, 0.18) !important;
+  }
+
+  .audit-card-redirect:hover {
+    border-color: rgba(245, 158, 11, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(245, 158, 11, 0.26), 0 0 14px rgba(249, 115, 22, 0.16) !important;
+  }
+  .light .audit-card-redirect:hover {
+    border-color: #F59E0B !important;
+    box-shadow: 0 8px 20px -3px rgba(245, 158, 11, 0.18) !important;
+  }
+
+  .audit-card-reputation:hover {
+    border-color: rgba(236, 72, 153, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(236, 72, 153, 0.26), 0 0 14px rgba(217, 70, 239, 0.16) !important;
+  }
+  .light .audit-card-reputation:hover {
+    border-color: #EC4899 !important;
+    box-shadow: 0 8px 20px -3px rgba(236, 72, 153, 0.18) !important;
+  }
+
+  .audit-card-aiforensics:hover {
+    border-color: rgba(147, 51, 234, 0.65) !important;
+    box-shadow: 0 8px 24px -3px rgba(147, 51, 234, 0.26), 0 0 16px rgba(6, 182, 212, 0.18) !important;
+  }
+  .light .audit-card-aiforensics:hover {
+    border-color: #9333EA !important;
+    box-shadow: 0 8px 20px -3px rgba(147, 51, 234, 0.18) !important;
+  }
+}
+
+/* 3. Status Badge Glow Effects */
+.status-badge-passed {
+  animation: auditBadgePulseEmerald 3s infinite ease-in-out;
+}
+@keyframes auditBadgePulseEmerald {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.45);
+  }
+}
+
+.status-badge-failed {
+  animation: auditBadgePulseRose 2.2s infinite ease-in-out;
+}
+@keyframes auditBadgePulseRose {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.55);
+  }
+}
+
+.status-badge-warning {
+  animation: auditBadgePulseAmber 2.6s infinite ease-in-out;
+}
+@keyframes auditBadgePulseAmber {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.50);
+  }
+}
+
+/* 4. Interactive AI Forensic Assessment Panel (Phase 4.8 Upgrade) */
+.ai-forensic-panel-aurora {
+  position: relative;
+  border-radius: 1.25rem;
+  transition: transform 350ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 350ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 300ms ease,
+              background 350ms ease;
+  border: 1px solid rgba(147, 51, 234, 0.45);
+  box-shadow: 0 8px 32px -4px rgba(147, 51, 234, 0.22), 0 0 20px rgba(6, 182, 212, 0.12), 0 0 25px rgba(59, 130, 246, 0.08);
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.18) 0%, rgba(14, 165, 233, 0.08) 50%, rgba(15, 23, 42, 0.65) 100%);
+  animation: forensicPanelBounce 420ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+}
+
+@keyframes forensicPanelBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.004);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.light .ai-forensic-panel-aurora {
+  border: 1px solid #D8B4FE;
+  box-shadow: 0 8px 24px -4px rgba(147, 51, 234, 0.12), 0 0 16px rgba(6, 182, 212, 0.08);
+  background: linear-gradient(135deg, #FAF5FF 0%, #F0FDFA 50%, #F0F9FF 100%);
+}
+
+.forensic-panel-icon {
+  transition: transform 300ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ai-forensic-panel-aurora:hover {
+    transform: translateY(-3px) scale(1.008);
+    border-color: rgba(168, 85, 247, 0.65);
+    box-shadow: 0 14px 40px -4px rgba(147, 51, 234, 0.32), 0 0 28px rgba(6, 182, 212, 0.25), 0 0 35px rgba(59, 130, 246, 0.18) !important;
+  }
+  .light .ai-forensic-panel-aurora:hover {
+    transform: translateY(-3px) scale(1.008);
+    border-color: #A855F7;
+    box-shadow: 0 12px 32px -4px rgba(147, 51, 234, 0.18), 0 0 22px rgba(6, 182, 212, 0.14) !important;
+  }
+  .ai-forensic-panel-aurora:hover .forensic-panel-icon {
+    transform: scale(1.18) rotate(10deg);
+  }
+}
+
+/* 4.1 Threat Evaluation Card: Electric Blue / Cyan */
+.forensic-card-threat {
+  position: relative;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(6, 182, 212, 0.45);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(14, 165, 233, 0.05) 60%, rgba(15, 23, 42, 0.7) 100%);
+  box-shadow: 0 4px 18px -2px rgba(6, 182, 212, 0.15);
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 260ms ease,
+              background 260ms ease;
+}
+
+.light .forensic-card-threat {
+  border: 1px solid #A5F3FC;
+  background: linear-gradient(135deg, #ECFEFF 0%, #F0F9FF 100%);
+  box-shadow: 0 3px 12px -2px rgba(6, 182, 212, 0.12);
+}
+
+.forensic-icon-threat {
+  transition: transform 280ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .forensic-card-threat:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(6, 182, 212, 0.75) !important;
+    box-shadow: 0 8px 24px -2px rgba(6, 182, 212, 0.35), 0 0 16px rgba(14, 165, 233, 0.22) !important;
+  }
+  .light .forensic-card-threat:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: #06B6D4 !important;
+    box-shadow: 0 8px 20px -2px rgba(6, 182, 212, 0.25) !important;
+  }
+  .forensic-card-threat:hover .forensic-icon-threat {
+    transform: scale(1.22) rotate(-8deg);
+  }
+}
+
+/* 4.2 Empirical Indicators Card: Emerald Green / Turquoise */
+.forensic-card-empirical {
+  position: relative;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(20, 184, 166, 0.05) 60%, rgba(15, 23, 42, 0.7) 100%);
+  box-shadow: 0 4px 18px -2px rgba(16, 185, 129, 0.15);
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 260ms ease,
+              background 260ms ease;
+}
+
+.light .forensic-card-empirical {
+  border: 1px solid #A7F3D0;
+  background: linear-gradient(135deg, #F0FDF4 0%, #CCFBF1 100%);
+  box-shadow: 0 3px 12px -2px rgba(16, 185, 129, 0.12);
+}
+
+.forensic-icon-empirical {
+  transition: transform 280ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .forensic-card-empirical:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(16, 185, 129, 0.75) !important;
+    box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.35), 0 0 16px rgba(20, 184, 166, 0.22) !important;
+  }
+  .light .forensic-card-empirical:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: #10B981 !important;
+    box-shadow: 0 8px 20px -2px rgba(16, 185, 129, 0.25) !important;
+  }
+  .forensic-card-empirical:hover .forensic-icon-empirical {
+    transform: scale(1.22) rotate(8deg);
+  }
+}
+
+/* 4.3 Defensive SOC Guidance Card: Violet / Indigo */
+.forensic-card-guidance {
+  position: relative;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(129, 140, 248, 0.05) 60%, rgba(15, 23, 42, 0.7) 100%);
+  box-shadow: 0 4px 18px -2px rgba(168, 85, 247, 0.15);
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 260ms ease,
+              background 260ms ease;
+}
+
+.light .forensic-card-guidance {
+  border: 1px solid #DDD6FE;
+  background: linear-gradient(135deg, #FAF5FF 0%, #EEF2FF 100%);
+  box-shadow: 0 3px 12px -2px rgba(168, 85, 247, 0.12);
+}
+
+.forensic-icon-guidance {
+  transition: transform 280ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .forensic-card-guidance:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(168, 85, 247, 0.75) !important;
+    box-shadow: 0 8px 24px -2px rgba(168, 85, 247, 0.35), 0 0 16px rgba(129, 140, 248, 0.22) !important;
+  }
+  .light .forensic-card-guidance:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: #A855F7 !important;
+    box-shadow: 0 8px 20px -2px rgba(168, 85, 247, 0.25) !important;
+  }
+  .forensic-card-guidance:hover .forensic-icon-guidance {
+    transform: scale(1.22) rotate(-8deg);
+  }
+}
+
+/* 4.4 Full AI Forensic Brief Report Card */
+.forensic-full-brief-card {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid rgba(6, 182, 212, 0.38);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(24, 24, 48, 0.85) 50%, rgba(15, 23, 42, 0.95) 100%);
+  box-shadow: 0 6px 24px -2px rgba(6, 182, 212, 0.12), 0 0 16px rgba(168, 85, 247, 0.08);
+  transition: transform 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 320ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 280ms ease,
+              background 280ms ease;
+  animation: briefCardEntrance 420ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+}
+
+@keyframes briefCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-1.5px) scale(1.003);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.light .forensic-full-brief-card {
+  border: 1px solid #BAE6FD;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #F1F5F9 100%);
+  box-shadow: 0 4px 16px -2px rgba(6, 182, 212, 0.10);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .forensic-full-brief-card:hover {
+    transform: translateY(-2px) scale(1.005);
+    border-color: rgba(168, 85, 247, 0.6) !important;
+    box-shadow: 0 10px 32px -4px rgba(6, 182, 212, 0.24), 0 0 22px rgba(168, 85, 247, 0.18) !important;
+  }
+  .light .forensic-full-brief-card:hover {
+    transform: translateY(-2px) scale(1.005);
+    border-color: #06B6D4 !important;
+    box-shadow: 0 8px 24px -3px rgba(6, 182, 212, 0.16) !important;
+  }
+}
+
+/* 4.5 Recommended SOC Action Cards */
+.soc-action-card {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  transition: transform 280ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 280ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+  animation: actionCardEntrance 360ms cubic-bezier(0.34, 1.25, 0.64, 1) both;
+}
+
+@keyframes actionCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-1.5px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.soc-action-delay-0 { animation-delay: 40ms; }
+.soc-action-delay-1 { animation-delay: 80ms; }
+.soc-action-delay-2 { animation-delay: 120ms; }
+.soc-action-delay-3 { animation-delay: 160ms; }
+
+@media (hover: hover) and (pointer: fine) {
+  .soc-action-card:hover {
+    transform: translateY(-2px) scale(1.015);
+  }
+}
+
+/* Action 1: Cyan / Electric Blue */
+.soc-action-1 {
+  border-color: rgba(6, 182, 212, 0.35);
+  background: rgba(6, 182, 212, 0.08);
+}
+.light .soc-action-1 {
+  border-color: #A5F3FC;
+  background: #ECFEFF;
+}
+@media (hover: hover) and (pointer: fine) {
+  .soc-action-1:hover {
+    border-color: rgba(6, 182, 212, 0.8) !important;
+    box-shadow: 0 6px 18px -2px rgba(6, 182, 212, 0.3) !important;
+  }
+  .light .soc-action-1:hover {
+    border-color: #06B6D4 !important;
+    box-shadow: 0 6px 16px -2px rgba(6, 182, 212, 0.22) !important;
+  }
+}
+
+/* Action 2: Royal Purple / Violet */
+.soc-action-2 {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.08);
+}
+.light .soc-action-2 {
+  border-color: #DDD6FE;
+  background: #FAF5FF;
+}
+@media (hover: hover) and (pointer: fine) {
+  .soc-action-2:hover {
+    border-color: rgba(168, 85, 247, 0.8) !important;
+    box-shadow: 0 6px 18px -2px rgba(168, 85, 247, 0.3) !important;
+  }
+  .light .soc-action-2:hover {
+    border-color: #A855F7 !important;
+    box-shadow: 0 6px 16px -2px rgba(168, 85, 247, 0.22) !important;
+  }
+}
+
+/* Action 3: Emerald / Teal */
+.soc-action-3 {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.08);
+}
+.light .soc-action-3 {
+  border-color: #A7F3D0;
+  background: #F0FDF4;
+}
+@media (hover: hover) and (pointer: fine) {
+  .soc-action-3:hover {
+    border-color: rgba(16, 185, 129, 0.8) !important;
+    box-shadow: 0 6px 18px -2px rgba(16, 185, 129, 0.3) !important;
+  }
+  .light .soc-action-3:hover {
+    border-color: #10B981 !important;
+    box-shadow: 0 6px 16px -2px rgba(16, 185, 129, 0.22) !important;
+  }
+}
+
+/* Action 4: Amber / Orange */
+.soc-action-4 {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.08);
+}
+.light .soc-action-4 {
+  border-color: #FDE68A;
+  background: #FFFBEB;
+}
+@media (hover: hover) and (pointer: fine) {
+  .soc-action-4:hover {
+    border-color: rgba(245, 158, 11, 0.8) !important;
+    box-shadow: 0 6px 18px -2px rgba(245, 158, 11, 0.3) !important;
+  }
+  .light .soc-action-4:hover {
+    border-color: #F59E0B !important;
+    box-shadow: 0 6px 16px -2px rgba(245, 158, 11, 0.22) !important;
+  }
+}
+
+.ai-forensic-btn-copy {
+  transition: transform 240ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              box-shadow 240ms cubic-bezier(0.34, 1.25, 0.64, 1),
+              background-color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ai-forensic-btn-copy:hover {
+    transform: translateY(-1.5px) scale(1.03);
+    box-shadow: 0 4px 14px -2px rgba(168, 85, 247, 0.35);
+  }
+  .ai-forensic-btn-copy:active {
+    transform: translateY(0) scale(0.97);
+  }
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .model-card-glow:hover,
+  .dataset-card-blue:hover,
+  .dataset-card-purple:hover,
+  .severity-card:hover,
+  .severity-card-critical:hover,
+  .severity-card-dangerous:hover,
+  .severity-card-suspicious:hover,
+  .severity-card-safe:hover,
+  .telemetry-container-glow:hover,
+  .telemetry-card-spam:hover,
+  .telemetry-card-phish:hover,
+  .url-threat-container-glow:hover,
+  .url-threat-card-glow:hover,
+  .soc-threat-card:hover,
+  .soc-threat-card:active,
+  .soc-report-container:hover,
+  .soc-report-action:hover,
+  .soc-report-action:active,
+  .soc-btn-copy:hover,
+  .soc-btn-print:hover,
+  .soc-btn-export:hover,
+  .soc-btn-toggle:hover,
+  .soc-forensic-narrative:hover,
+  .soc-timeline-container:hover,
+  .soc-timeline-step:hover,
+  .soc-narrative-icon,
+  .soc-step-badge,
+  .investigation-nav-tab,
+  .investigation-nav-tab-active,
+  .investigation-tab-indicator,
+  .investigation-panel-enter,
+  .url-anatomy-card,
+  .url-anatomy-card:hover,
+  .url-anatomy-icon,
+  .url-tls-card,
+  .url-tls-card:hover,
+  .url-tls-icon,
+  .url-anatomy-row,
+  .url-anatomy-row:hover,
+  .url-row-icon,
+  .url-row-badge,
+  .security-audit-card,
+  .security-audit-card:hover,
+  .security-audit-card:active,
+  .audit-card-icon,
+  .status-badge-passed,
+  .status-badge-failed,
+  .status-badge-warning,
+  .ai-forensic-panel-aurora,
+  .ai-forensic-panel-aurora:hover,
+  .forensic-panel-icon,
+  .forensic-card-threat,
+  .forensic-card-threat:hover,
+  .forensic-icon-threat,
+  .forensic-card-empirical,
+  .forensic-card-empirical:hover,
+  .forensic-icon-empirical,
+  .forensic-card-guidance,
+  .forensic-card-guidance:hover,
+  .forensic-icon-guidance,
+  .forensic-full-brief-card,
+  .forensic-full-brief-card:hover,
+  .soc-action-card,
+  .soc-action-card:hover,
+  .soc-action-1:hover,
+  .soc-action-2:hover,
+  .soc-action-3:hover,
+  .soc-action-4:hover,
+  .ai-forensic-btn-copy:hover,
+  .ai-forensic-btn-copy:active,
+  .soc-verdict-pulse-malicious,
+  .soc-verdict-pulse-suspicious,
+  .soc-verdict-pulse-clean,
+  .soc-verdict-pulse-unknown {
+    transform: none !important;
+    animation: none !important;
+  }
+}

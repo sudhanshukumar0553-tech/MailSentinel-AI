@@ -1,0 +1,342 @@
+{
+  "status": "completed",
+  "models": {
+    "spam_logistic_regression": {
+      "accuracy": 0.96,
+      "precision": 0.94,
+      "recall": 0.9792,
+      "f1_score": 0.9592,
+      "roc_auc": 0.9879,
+      "confusion_matrix": {
+        "matrix": [
+          [
+            147,
+            9
+          ],
+          [
+            3,
+            141
+          ]
+        ],
+        "true_negatives": 147,
+        "false_positives": 9,
+        "false_negatives": 3,
+        "true_positives": 141
+      },
+      "total_test_samples": 300,
+      "dataset": "bvk/ENRON-spam",
+      "class_distribution": {
+        "ham_count": 1035,
+        "spam_count": 965,
+        "spam_ratio": 0.4825
+      },
+      "top_features": {
+        "malicious_indicators": [
+          {
+            "token": "http",
+            "weight": 2.2374
+          },
+          {
+            "token": "software",
+            "weight": 1.5469
+          },
+          {
+            "token": "click",
+            "weight": 1.4174
+          },
+          {
+            "token": "money",
+            "weight": 1.3671
+          },
+          {
+            "token": "email",
+            "weight": 1.3473
+          },
+          {
+            "token": "info",
+            "weight": 1.2844
+          },
+          {
+            "token": "online",
+            "weight": 1.2685
+          },
+          {
+            "token": "save",
+            "weight": 1.2681
+          },
+          {
+            "token": "life",
+            "weight": 1.2651
+          },
+          {
+            "token": "subject",
+            "weight": 1.1414
+          },
+          {
+            "token": "stop",
+            "weight": 1.1058
+          },
+          {
+            "token": "com",
+            "weight": 0.9745
+          },
+          {
+            "token": "remove",
+            "weight": 0.9548
+          },
+          {
+            "token": "2005",
+            "weight": 0.9462
+          },
+          {
+            "token": "hello",
+            "weight": 0.9399
+          }
+        ],
+        "safe_indicators": [
+          {
+            "token": "enron",
+            "weight": -3.6595
+          },
+          {
+            "token": "2001",
+            "weight": -2.1815
+          },
+          {
+            "token": "vince",
+            "weight": -1.9659
+          },
+          {
+            "token": "attached",
+            "weight": -1.9403
+          },
+          {
+            "token": "2000",
+            "weight": -1.8303
+          },
+          {
+            "token": "thanks",
+            "weight": -1.8115
+          },
+          {
+            "token": "louise",
+            "weight": -1.7817
+          },
+          {
+            "token": "gas",
+            "weight": -1.6588
+          },
+          {
+            "token": "let know",
+            "weight": -1.6279
+          },
+          {
+            "token": "questions",
+            "weight": -1.5978
+          },
+          {
+            "token": "meeting",
+            "weight": -1.5496
+          },
+          {
+            "token": "pm",
+            "weight": -1.5037
+          },
+          {
+            "token": "713",
+            "weight": -1.4779
+          },
+          {
+            "token": "deal",
+            "weight": -1.344
+          },
+          {
+            "token": "enron com",
+            "weight": -1.3015
+          }
+        ]
+      }
+    },
+    "spam_naive_bayes_baseline": {
+      "accuracy": 0.9567,
+      "precision": 0.9338,
+      "recall": 0.9792,
+      "f1_score": 0.9559,
+      "roc_auc": 0.9919,
+      "confusion_matrix": {
+        "matrix": [
+          [
+            146,
+            10
+          ],
+          [
+            3,
+            141
+          ]
+        ],
+        "true_negatives": 146,
+        "false_positives": 10,
+        "false_negatives": 3,
+        "true_positives": 141
+      },
+      "total_test_samples": 300,
+      "dataset": "bvk/ENRON-spam"
+    },
+    "phishing_logistic_regression": {
+      "accuracy": 0.9633,
+      "precision": 0.9316,
+      "recall": 0.9732,
+      "f1_score": 0.952,
+      "roc_auc": 0.9928,
+      "confusion_matrix": {
+        "matrix": [
+          [
+            180,
+            8
+          ],
+          [
+            3,
+            109
+          ]
+        ],
+        "true_negatives": 180,
+        "false_positives": 8,
+        "false_negatives": 3,
+        "true_positives": 109
+      },
+      "total_test_samples": 300,
+      "dataset": "zefang-liu/phishing-email-dataset",
+      "class_distribution": {
+        "safe_count": 1254,
+        "phishing_count": 746,
+        "phishing_ratio": 0.373
+      },
+      "top_features": {
+        "malicious_indicators": [
+          {
+            "token": "click",
+            "weight": 2.468
+          },
+          {
+            "token": "free",
+            "weight": 1.7339
+          },
+          {
+            "token": "money",
+            "weight": 1.6935
+          },
+          {
+            "token": "online",
+            "weight": 1.584
+          },
+          {
+            "token": "remove",
+            "weight": 1.4534
+          },
+          {
+            "token": "email",
+            "weight": 1.4284
+          },
+          {
+            "token": "removed",
+            "weight": 1.2891
+          },
+          {
+            "token": "best",
+            "weight": 1.2561
+          },
+          {
+            "token": "save",
+            "weight": 1.2394
+          },
+          {
+            "token": "info",
+            "weight": 1.233
+          },
+          {
+            "token": "meds",
+            "weight": 1.185
+          },
+          {
+            "token": "account",
+            "weight": 1.1552
+          },
+          {
+            "token": "2005",
+            "weight": 1.1271
+          },
+          {
+            "token": "site",
+            "weight": 1.0807
+          },
+          {
+            "token": "credit",
+            "weight": 1.0711
+          }
+        ],
+        "safe_indicators": [
+          {
+            "token": "enron",
+            "weight": -2.8006
+          },
+          {
+            "token": "wrote",
+            "weight": -1.5664
+          },
+          {
+            "token": "2002",
+            "weight": -1.5646
+          },
+          {
+            "token": "language",
+            "weight": -1.5083
+          },
+          {
+            "token": "attached",
+            "weight": -1.4376
+          },
+          {
+            "token": "thanks",
+            "weight": -1.3877
+          },
+          {
+            "token": "university",
+            "weight": -1.352
+          },
+          {
+            "token": "linguistics",
+            "weight": -1.29
+          },
+          {
+            "token": "2000",
+            "weight": -1.2473
+          },
+          {
+            "token": "01",
+            "weight": -1.2338
+          },
+          {
+            "token": "date",
+            "weight": -1.2049
+          },
+          {
+            "token": "url http",
+            "weight": -1.2036
+          },
+          {
+            "token": "vince",
+            "weight": -1.157
+          },
+          {
+            "token": "2001",
+            "weight": -1.149
+          },
+          {
+            "token": "url",
+            "weight": -1.1454
+          }
+        ]
+      }
+    }
+  }
+}
