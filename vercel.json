@@ -6,15 +6,19 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api/main.py"
+    },
+    {
+      "source": "/api",
+      "destination": "/api/main.py"
     },
     {
       "source": "/docs",
-      "destination": "/api/index.py"
+      "destination": "/api/main.py"
     },
     {
       "source": "/openapi.json",
-      "destination": "/api/index.py"
+      "destination": "/api/main.py"
     },
     {
       "source": "/(.*)",
