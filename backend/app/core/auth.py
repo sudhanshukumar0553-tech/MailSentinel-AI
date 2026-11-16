@@ -15,8 +15,14 @@ from dataclasses import dataclass
 import time
 import base64
 from fastapi import Header, HTTPException, status, Depends
-from jose import jwt, JWTError
-from jose.exceptions import ExpiredSignatureError, JWTClaimsError
+try:
+    from jose import jwt, JWTError
+    from jose.exceptions import ExpiredSignatureError, JWTClaimsError
+except ImportError:
+    jwt = None
+    JWTError = Exception
+    ExpiredSignatureError = Exception
+    JWTClaimsError = Exception
 import httpx
 
 from backend.app.core.config import settings
