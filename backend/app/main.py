@@ -24,10 +24,12 @@ async def lifespan(app: FastAPI):
     Non-blocking to ensure serverless cold starts never abort.
     """
     logger.info("Launching %s (Version: %s)...", settings.PROJECT_NAME, settings.VERSION)
-    try:
-        await init_db()
-    except Exception as exc:
-        logger.warning("Database initialization deferred on startup: %s", exc)
+    is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+    if not is_serverless:
+        try:
+            await init_db()
+        except Exception as exc:
+            logger.warning("Database initialization deferred on startup: %s", exc)
     logger.info("Hugging Face Provider Token configured: %s", settings.is_hf_token_configured)
     logger.info("Target AI Model: %s", settings.HF_MODEL_ID)
     yield
@@ -71,6 +73,20 @@ def create_application() -> FastAPI:
     async def ping():
         """Ultra-fast zero-overhead health probe."""
         return {"status": "ok", "app": settings.PROJECT_NAME}
+
+    @app.get("/api/diagnostic", tags=["Root"])
+    async def diagnostic():
+        """Runtime diagnostic information."""
+        import sys, os
+        return {
+            "status": "healthy",
+            "app": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "cwd": os.getcwd(),
+            "demo_mode": settings.DEMO_MODE,
+            "gemini_configured": settings.is_gemini_configured,
+            "python": sys.version
+        }
 
     @app.get("/", tags=["Root"])
     @app.get("/api", tags=["Root"])
