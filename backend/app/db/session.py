@@ -72,26 +72,29 @@ async def init_db() -> None:
     Initializes database tables defined in the ORM models.
     Called on application startup.
     """
-    # Import all models to ensure they are registered with Base.metadata
-    import backend.app.db.models  # noqa: F401
+    try:
+        # Import all models to ensure they are registered with Base.metadata
+        import backend.app.db.models  # noqa: F401
 
-    logger.info("Initializing database tables...")
-    async with engine.begin() as conn:
-        if "sqlite" in settings.DATABASE_URL:
+        logger.info("Initializing database tables...")
+        async with engine.begin() as conn:
+            if "sqlite" in settings.DATABASE_URL:
+                try:
+                    import os
+                    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+                        await conn.execute(text("PRAGMA journal_mode=MEMORY;"))
+                    else:
+                        await conn.execute(text("PRAGMA journal_mode=WAL;"))
+                    await conn.execute(text("PRAGMA busy_timeout=30000;"))
+                except Exception:
+                    pass
+            await conn.run_sync(Base.metadata.create_all)
+            # Non-destructive schema migration check for chat_sessions.analyst_id
             try:
-                import os
-                if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
-                    await conn.execute(text("PRAGMA journal_mode=MEMORY;"))
-                else:
-                    await conn.execute(text("PRAGMA journal_mode=WAL;"))
-                await conn.execute(text("PRAGMA busy_timeout=30000;"))
+                await conn.execute(text("ALTER TABLE chat_sessions ADD COLUMN analyst_id VARCHAR(64) DEFAULT 'analyst-default-dev'"))
+                logger.info("Added missing 'analyst_id' column to chat_sessions table.")
             except Exception:
                 pass
-        await conn.run_sync(Base.metadata.create_all)
-        # Non-destructive schema migration check for chat_sessions.analyst_id
-        try:
-            await conn.execute(text("ALTER TABLE chat_sessions ADD COLUMN analyst_id VARCHAR(64) DEFAULT 'analyst-default-dev'"))
-            logger.info("Added missing 'analyst_id' column to chat_sessions table.")
-        except Exception:
-            pass
-    logger.info("Database tables initialized successfully.")
+        logger.info("Database tables initialized successfully.")
+    except Exception as exc:
+        logger.warning("Database table initialization warning (non-fatal): %s", exc)

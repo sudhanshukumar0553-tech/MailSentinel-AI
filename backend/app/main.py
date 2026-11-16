@@ -21,9 +21,13 @@ async def lifespan(app: FastAPI):
     """
     Lifespan events:
     Executes table creation and startup health verification on application boot.
+    Non-blocking to ensure serverless cold starts never abort.
     """
     logger.info("Launching %s (Version: %s)...", settings.PROJECT_NAME, settings.VERSION)
-    await init_db()
+    try:
+        await init_db()
+    except Exception as exc:
+        logger.warning("Database initialization deferred on startup: %s", exc)
     logger.info("Hugging Face Provider Token configured: %s", settings.is_hf_token_configured)
     logger.info("Target AI Model: %s", settings.HF_MODEL_ID)
     yield
@@ -58,6 +62,12 @@ def create_application() -> FastAPI:
     app.include_router(health.router)
     app.include_router(health.router, prefix="/api")
     app.include_router(api_v1_router, prefix="/api/v1")
+
+    @app.get("/ping", tags=["Root"])
+    @app.get("/api/ping", tags=["Root"])
+    async def ping():
+        """Ultra-fast zero-overhead health probe."""
+        return {"status": "ok", "app": settings.PROJECT_NAME}
 
     @app.get("/", tags=["Root"])
     @app.get("/api", tags=["Root"])
