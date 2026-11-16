@@ -5,6 +5,8 @@ Production-oriented email security platform combining Machine Learning,
 heuristics analysis, and an AI investigation agent.
 """
 
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,12 +26,10 @@ async def lifespan(app: FastAPI):
     Non-blocking to ensure serverless cold starts never abort.
     """
     logger.info("Launching %s (Version: %s)...", settings.PROJECT_NAME, settings.VERSION)
-    is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
-    if not is_serverless:
-        try:
-            await init_db()
-        except Exception as exc:
-            logger.warning("Database initialization deferred on startup: %s", exc)
+    try:
+        await init_db()
+    except Exception as exc:
+        logger.warning("Database initialization deferred on startup: %s", exc)
     logger.info("Hugging Face Provider Token configured: %s", settings.is_hf_token_configured)
     logger.info("Target AI Model: %s", settings.HF_MODEL_ID)
     yield
