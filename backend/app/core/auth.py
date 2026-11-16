@@ -318,11 +318,16 @@ async def get_current_user(
     if provided_token in VALID_ANALYST_CREDENTIALS:
         return VALID_ANALYST_CREDENTIALS[provided_token]
 
-    # Path B: Clerk JWT verification
+    # Path B: Clerk JWT verification (only if Clerk is configured and active)
     if provided_token.startswith("ey"):
-        return await verify_clerk_jwt(provided_token)
+        if settings.is_clerk_configured and not settings.DEMO_MODE:
+            return await verify_clerk_jwt(provided_token)
+        return VALID_ANALYST_CREDENTIALS["mailsentinel-demo-analyst-key"]
 
-    # Path C: Invalid credential
+    # Path C: Demo fallback / invalid credential
+    if settings.DEMO_MODE:
+        return VALID_ANALYST_CREDENTIALS["mailsentinel-demo-analyst-key"]
+
     logger.warning("Authentication rejected: Invalid credential format or unknown key.")
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

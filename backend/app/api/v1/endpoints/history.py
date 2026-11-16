@@ -34,8 +34,12 @@ async def list_scans(
     if threat_level:
         stmt = stmt.where(ScanRecord.threat_level == threat_level.upper())
 
-    result = await db.execute(stmt)
-    scans = result.scalars().all()
+    try:
+        result = await db.execute(stmt)
+        scans = result.scalars().all()
+    except Exception as exc:
+        logger.warning("History query encountered error (returning safe fallback): %s", exc)
+        scans = []
 
     items = [
         HistoryScanItem(

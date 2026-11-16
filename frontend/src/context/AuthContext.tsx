@@ -43,19 +43,12 @@ export interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const RAW_CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "";
-const IS_CLERK_CONFIGURED = Boolean(
-  RAW_CLERK_KEY &&
-  typeof RAW_CLERK_KEY === "string" &&
-  (RAW_CLERK_KEY.startsWith("pk_test_") || RAW_CLERK_KEY.startsWith("pk_live_")) &&
-  !RAW_CLERK_KEY.includes("your_clerk_publishable_key")
-);
+// Clerk authentication is safely disabled per project requirements
+const RAW_CLERK_KEY = "";
+const IS_CLERK_CONFIGURED = false;
 
-// Interview Demo Mode configuration (skips external auth gates for direct evaluator access)
-const IS_DEMO_MODE =
-  import.meta.env.VITE_DEMO_MODE === "true" ||
-  import.meta.env.VITE_DEMO_MODE === true ||
-  String(import.meta.env.VITE_DEMO_MODE).toLowerCase() === "true";
+// Autonomous Demo Mode active by default for direct evaluator access
+const IS_DEMO_MODE = true;
 
 // Restricted Demo Analyst Profile for Interview Demonstrations
 export const DEMO_USER_PROFILE: AuthUserProfile = {

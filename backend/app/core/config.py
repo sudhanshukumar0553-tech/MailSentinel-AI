@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     API_PORT: int = int(os.environ.get("PORT", 8000))
 
     # Interview Demo Mode (When True: grants restricted SOC Analyst access for demo evaluation)
-    DEMO_MODE: bool = False
+    DEMO_MODE: bool = True
 
     # Google Gemini AI Configuration (Primary Copilot LLM - Server-Side Only)
     GEMINI_API_KEY: str = ""
