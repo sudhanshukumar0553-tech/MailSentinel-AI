@@ -58,15 +58,16 @@ CRITICAL OPERATIONAL RULES:
 4. Distinguish between verified empirical facts (ML probabilities, URL entropy, SPF/DKIM verification) and defensive advisory recommendations.
 5. VISUAL DIAGRAM GENERATION:
    When explaining an attack lifecycle (e.g. phishing, ransomware, BEC, social engineering), an email authentication protocol (SPF, DKIM, DMARC), a SOC incident response workflow, network security architecture, or machine learning classification pipeline, ALWAYS include a clean, valid Mermaid diagram in a ```mermaid ... ``` code fence.
-   Always use simple, standard Mermaid syntax like `flowchart LR` or `flowchart TD` or `sequenceDiagram` with standard node labels in brackets (e.g. `[Attacker] --> [Fake Email]`).
+   Always use simple, standard Mermaid syntax like `flowchart LR` or `flowchart TD` or `sequenceDiagram`.
+   CRITICAL FOR MERMAID: Always wrap node text inside double quotes within square brackets, e.g. `A["Inbound Email"] --> B["FastAPI Backend & Auth"]` to prevent special characters (&, /, (), :) from causing syntax errors.
    Example for phishing attack:
    ```mermaid
    flowchart LR
-       A[Attacker] --> B[Fake Phishing Email]
-       B --> C[Victim Opens Email]
-       C --> D[Clicks Malicious Link]
-       D --> E[Credential Harvesting Portal]
-       E --> F[Attacker Unauthorized Access]
+       A["Attacker"] --> B["Fake Phishing Email"]
+       B --> C["Victim Opens Email"]
+       C --> D["Clicks Malicious Link"]
+       D --> E["Credential Harvesting Portal"]
+       E --> F["Attacker Unauthorized Access"]
    ```
 """
 
@@ -262,13 +263,13 @@ def execute_deterministic_chat_response(
             "- **React 19 SOC Dashboard**: High-contrast cyber SOC interface supporting dark/light themes, streaming responses, and interactive Mermaid diagrams.\n\n"
             "```mermaid\n"
             "flowchart TD\n"
-            "    A[Inbound Email / Query] --> B[FastAPI Backend & Auth]\n"
-            "    B --> C[Intent Router & Zero-Trust Filter]\n"
-            "    C --> D[TF-IDF Machine Learning Models]\n"
-            "    C --> E[URL Entropy & RFC822 Header Parsers]\n"
-            "    D & E --> F[Unified Threat Risk Scoring Engine]\n"
-            "    F --> G[Sentinel Copilot Gemini 3.1 Synthesis]\n"
-            "    G --> H[React SOC Dashboard & Mermaid Diagrams]\n"
+            "    A[\"Inbound Email / Query\"] --> B[\"FastAPI Backend & Auth\"]\n"
+            "    B --> C[\"Intent Router & Zero-Trust Filter\"]\n"
+            "    C --> D[\"TF-IDF Machine Learning Models\"]\n"
+            "    C --> E[\"URL Entropy & RFC822 Header Parsers\"]\n"
+            "    D & E --> F[\"Unified Threat Risk Scoring Engine\"]\n"
+            "    F --> G[\"Sentinel Copilot Gemini 3.1 Synthesis\"]\n"
+            "    G --> H[\"React SOC Dashboard & Mermaid Diagrams\"]\n"
             "```\n"
         )
         return {

@@ -12,7 +12,7 @@ export const RichMessageRenderer: React.FC<RichMessageRendererProps> = ({ conten
 
   // Split content by code blocks: ```lang ... ```
   const parts: Array<{ type: "text" | "code" | "mermaid"; content: string; lang?: string }> = [];
-  const codeBlockRegex = /```([a-zA-Z0-9_\-]*)\n([\s\S]*?)```/g;
+  const codeBlockRegex = /```([a-zA-Z0-9_\-\s]*?)\n([\s\S]*?)```/g;
 
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -27,8 +27,21 @@ export const RichMessageRenderer: React.FC<RichMessageRendererProps> = ({ conten
 
     const lang = (match[1] || "").toLowerCase().trim();
     const code = match[2];
+    const trimmedCode = code.trim();
 
-    if (lang === "mermaid") {
+    const isMermaid =
+      lang === "mermaid" ||
+      lang.startsWith("mermaid") ||
+      trimmedCode.startsWith("flowchart") ||
+      trimmedCode.startsWith("graph TD") ||
+      trimmedCode.startsWith("graph LR") ||
+      trimmedCode.startsWith("graph TB") ||
+      trimmedCode.startsWith("sequenceDiagram") ||
+      trimmedCode.startsWith("classDiagram") ||
+      trimmedCode.startsWith("stateDiagram") ||
+      trimmedCode.startsWith("erDiagram");
+
+    if (isMermaid) {
       parts.push({
         type: "mermaid",
         content: code

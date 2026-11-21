@@ -68,6 +68,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
   const [health, setHealth] = useState<{
     database: string;
+    database_engine?: string;
+    database_latency_ms?: number;
     hf_configured: boolean;
     status: string;
   } | null>(null);
@@ -462,7 +464,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                   ? "bg-slate-900/90 border-slate-800 text-slate-300"
                   : "bg-slate-50 border-slate-200 text-slate-700 shadow-xs"
               }`}
-              title="SQLite Database Health Status"
+              title={`${health?.database_engine === "postgresql" ? "Neon PostgreSQL" : "SQLite"} Database Health Status`}
             >
               <span
                 className={`w-2 h-2 rounded-full shrink-0 ${
@@ -471,7 +473,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                     : "bg-rose-400"
                 }`}
               />
-              <span className="font-semibold">DB: {health?.database === "connected" ? "SQLite OK" : "Offline"}</span>
+              <span className="font-semibold">
+                DB: {health?.database === "connected"
+                  ? (health?.database_engine === "postgresql" ? "PostgreSQL OK" : "SQLite OK")
+                  : "Offline"}
+              </span>
             </div>
 
             {/* Dedicated Divider between Badges */}
@@ -561,7 +567,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                   health?.database === "connected" ? "bg-emerald-400" : "bg-rose-400"
                 }`}
               />
-              DB: {health?.database === "connected" ? "SQLite OK" : "Offline"}
+              DB: {health?.database === "connected"
+                ? (health?.database_engine === "postgresql" ? "PostgreSQL OK" : "SQLite OK")
+                : "Offline"}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-cyan-400" />

@@ -119,7 +119,7 @@ async function request<T>(endpoint: string, options?: RequestInit, timeoutMs = 2
 export const api = {
   // System Health
   async getHealth() {
-    return request<{ status: string; database: string; hf_configured: boolean; hf_model: string }>("/health");
+    return request<{ status: string; database: string; database_engine?: string; database_latency_ms?: number; hf_configured: boolean; hf_model: string }>("/health");
   },
 
   // Live Email Scanner
