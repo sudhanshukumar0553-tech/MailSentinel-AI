@@ -232,8 +232,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
           {/* Right Controls: Auth, Status & Theme */}
           <div className="flex items-center gap-2 sm:gap-2.5 text-xs font-mono shrink-0">
-            {/* Interview Demo Mode Badge */}
-            {isDemoMode && (
+            {/* Interview Demo Mode Badge (Local Development Only) */}
+            {isDemoMode && import.meta.env.DEV && (
               <div
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[11px] font-mono tracking-wide shadow-[0_0_12px_rgba(245,158,11,0.2)] select-none shrink-0"
                 title="Interview Demonstration Mode: Direct SOC Analyst Access"
@@ -358,46 +358,48 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                         {renderRoleBadge(role)}
                       </div>
 
-                      {/* Quick Switch Role (Sandbox Feature) */}
-                      {isDemoMode ? (
-                        <div className="py-2.5 border-b border-slate-800 space-y-1.5">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400/90 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-amber-400" />
-                            <span>Interview Demo Restrictions</span>
+                      {/* Quick Switch Role (Development Sandbox Feature Only) */}
+                      {import.meta.env.DEV && (
+                        isDemoMode ? (
+                          <div className="py-2.5 border-b border-slate-800 space-y-1.5">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400/90 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-amber-400" />
+                              <span>Interview Demo Restrictions</span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                              Operating as <span className="text-cyan-300 font-semibold">SOC Analyst</span> with full investigative access. Administrative actions are locked for safety.
+                            </p>
                           </div>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Operating as <span className="text-cyan-300 font-semibold">SOC Analyst</span> with full investigative access. Administrative actions are locked for safety.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="py-2.5 border-b border-slate-800 space-y-1.5">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-cyan-400" />
-                            <span>Simulate Enterprise Role</span>
+                        ) : (
+                          <div className="py-2.5 border-b border-slate-800 space-y-1.5">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-cyan-400" />
+                              <span>Simulate Enterprise Role (Dev Only)</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1">
+                              {(["Admin", "SOC Analyst", "Customer"] as UserRole[]).map((r) => (
+                                <button
+                                  key={r}
+                                  onClick={() => {
+                                    switchDemoRole?.(r);
+                                    setProfileDropdownOpen(false);
+                                  }}
+                                  className={`px-1.5 py-1 rounded text-[10px] font-medium border text-center transition-all cursor-pointer ${
+                                    role === r
+                                      ? isDark
+                                        ? "bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold"
+                                        : "bg-sky-100 border-sky-400 text-sky-800 font-bold"
+                                      : isDark
+                                      ? "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                                      : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900"
+                                  }`}
+                                >
+                                  {r === "SOC Analyst" ? "Analyst" : r}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-1">
-                            {(["Admin", "SOC Analyst", "Customer"] as UserRole[]).map((r) => (
-                              <button
-                                key={r}
-                                onClick={() => {
-                                  switchDemoRole?.(r);
-                                  setProfileDropdownOpen(false);
-                                }}
-                                className={`px-1.5 py-1 rounded text-[10px] font-medium border text-center transition-all cursor-pointer ${
-                                  role === r
-                                    ? isDark
-                                      ? "bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold"
-                                      : "bg-sky-100 border-sky-400 text-sky-800 font-bold"
-                                    : isDark
-                                    ? "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
-                                    : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900"
-                                }`}
-                              >
-                                {r === "SOC Analyst" ? "Analyst" : r}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                        )
                       )}
 
                       {/* Sign Out Action */}

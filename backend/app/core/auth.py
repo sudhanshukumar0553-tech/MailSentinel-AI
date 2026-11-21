@@ -311,33 +311,24 @@ async def get_current_user(
         provided_token = x_api_key.strip()
 
     if not provided_token:
-        # If DEMO_MODE is active on the backend, grant restricted SOC Analyst access for demo evaluation
-        if settings.DEMO_MODE:
-            return VALID_ANALYST_CREDENTIALS["mailsentinel-demo-analyst-key"]
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required. Provide a valid Bearer token or API key.",
+            detail="Authentication required. Provide a valid Bearer token.",
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-    # Path A: Internal development/analyst API key
-    if provided_token in VALID_ANALYST_CREDENTIALS:
+    # Path A: Clerk RS256 JWT verification (Primary & Mandatory for all end-user traffic)
+    if provided_token.startswith("ey"):
+        return await verify_clerk_jwt(provided_token)
+
+    # Path B: Internal automated agent API key (Scoped strictly to development/testing)
+    if settings.DEBUG and provided_token in VALID_ANALYST_CREDENTIALS:
         return VALID_ANALYST_CREDENTIALS[provided_token]
 
-    # Path B: Clerk JWT verification (only if Clerk is configured and active)
-    if provided_token.startswith("ey"):
-        if settings.is_clerk_configured and not settings.DEMO_MODE:
-            return await verify_clerk_jwt(provided_token)
-        return VALID_ANALYST_CREDENTIALS["mailsentinel-demo-analyst-key"]
-
-    # Path C: Demo fallback / invalid credential
-    if settings.DEMO_MODE:
-        return VALID_ANALYST_CREDENTIALS["mailsentinel-demo-analyst-key"]
-
-    logger.warning("Authentication rejected: Invalid credential format or unknown key.")
+    logger.warning("Authentication rejected: Invalid credential format or unverified token.")
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication required. Provide a valid Bearer API key.",
+        detail="Authentication required. Valid Clerk Bearer token required.",
         headers={"WWW-Authenticate": "Bearer"}
     )
 

@@ -175,47 +175,49 @@ export const LoginScreen: React.FC = () => {
               />
             </div>
 
-            {/* SOC Internal Analyst & Automated Test Access */}
-            <div
-              className={`p-4 rounded-xl border text-xs ${
-                isDark ? "bg-slate-900/60 border-slate-800" : "bg-white border-slate-200 shadow-sm"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
-                  Internal SOC Analyst & Test Access
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  Analyst Bypass
-                </span>
+            {/* SOC Internal Analyst & Automated Test Access (Local Development Only) */}
+            {import.meta.env.DEV && (
+              <div
+                className={`p-4 rounded-xl border text-xs ${
+                  isDark ? "bg-slate-900/60 border-slate-800" : "bg-white border-slate-200 shadow-sm"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                    Internal SOC Analyst & Test Access (Dev Only)
+                  </span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                    Analyst Bypass
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => switchDemoRole?.("SOC Analyst")}
+                    className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                      isDark
+                        ? "bg-slate-800/80 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-500/50"
+                        : "bg-sky-50 border-sky-200 text-sky-800 hover:bg-sky-100"
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Senior SOC Analyst</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchDemoRole?.("Admin")}
+                    className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                      isDark
+                        ? "bg-slate-800/80 border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-500/50"
+                        : "bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100"
+                    }`}
+                  >
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                    <span>Chief Architect</span>
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => switchDemoRole?.("SOC Analyst")}
-                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
-                    isDark
-                      ? "bg-slate-800/80 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-500/50"
-                      : "bg-sky-50 border-sky-200 text-sky-800 hover:bg-sky-100"
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Senior SOC Analyst</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchDemoRole?.("Admin")}
-                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
-                    isDark
-                      ? "bg-slate-800/80 border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-500/50"
-                      : "bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100"
-                  }`}
-                >
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                  <span>Chief Architect</span>
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         ) : (
           /* Sandbox / Local Fallback Mode (Defaults to Signed Out) */

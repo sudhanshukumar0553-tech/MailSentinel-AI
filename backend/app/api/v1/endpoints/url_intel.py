@@ -8,9 +8,10 @@ Endpoints for multi-engine URL threat reputation, SSRF-safe redirect tracing, an
 """
 
 from typing import List, Dict, Any
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
+from backend.app.core.auth import AuthenticatedUser, get_current_user
 from backend.app.schemas.url_intel import (
     UrlAnalyzeRequest,
     UrlBatchAnalyzeRequest,
@@ -30,7 +31,10 @@ router = APIRouter(prefix="/url", tags=["AI URL Threat Intelligence"])
 
 
 @router.post("/analyze", response_model=UrlThreatIntelResponse, status_code=status.HTTP_200_OK)
-async def analyze_url(payload: UrlAnalyzeRequest):
+async def analyze_url(
+    payload: UrlAnalyzeRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Submits a URL for comprehensive threat intelligence analysis:
     - SSRF prevention & DNS validation
@@ -54,7 +58,10 @@ async def analyze_url(payload: UrlAnalyzeRequest):
 
 
 @router.post("/batch", response_model=List[UrlThreatIntelResponse], status_code=status.HTTP_200_OK)
-async def analyze_url_batch_endpoint(payload: UrlBatchAnalyzeRequest):
+async def analyze_url_batch_endpoint(
+    payload: UrlBatchAnalyzeRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """Analyzes a batch of up to 50 URLs concurrently."""
     logger.info("Batch analyzing %d URLs for threat intelligence...", len(payload.urls))
     try:
@@ -69,7 +76,10 @@ async def analyze_url_batch_endpoint(payload: UrlBatchAnalyzeRequest):
 
 
 @router.post("/extract", response_model=List[UrlThreatIntelResponse], status_code=status.HTTP_200_OK)
-async def extract_and_analyze_urls_endpoint(payload: UrlExtractRequest):
+async def extract_and_analyze_urls_endpoint(
+    payload: UrlExtractRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Safely extracts all unique URLs from plain text or HTML email content,
     normalizes and defangs them, and runs batch multi-engine threat intelligence analysis.
@@ -92,7 +102,10 @@ async def extract_and_analyze_urls_endpoint(payload: UrlExtractRequest):
 
 
 @router.post("/investigate", response_model=CustomUrlInvestigationResponse, status_code=status.HTTP_200_OK)
-async def investigate_custom_url_endpoint(payload: CustomUrlInvestigationRequest):
+async def investigate_custom_url_endpoint(
+    payload: CustomUrlInvestigationRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Submits a user-provided URL or defanged IOC for deep AI threat investigation:
     - Input validation & defanged syntax detection

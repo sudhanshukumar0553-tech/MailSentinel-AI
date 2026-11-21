@@ -14,7 +14,7 @@ import { LoadingScreen } from "./components/LoadingScreen";
 
 function AppContent() {
   const { isDark } = useTheme();
-  const { role, isSignedIn, isLoading, isDemoMode } = useAuthContext();
+  const { role, isSignedIn, isLoading } = useAuthContext();
   const [activeTab, setActiveTab] = useState<string>("scanner");
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState<number>(0);
   const [agentPayload, setAgentPayload] = useState<{
@@ -54,17 +54,13 @@ function AppContent() {
     setHistoryRefreshTrigger((prev) => prev + 1);
   };
 
-  // When DEMO_MODE is active, directly mount the SOC platform interface
-  if (!isDemoMode) {
-    // 1. While Clerk is loading, display the professional MailSentinel loading screen
-    if (isLoading) {
-      return <LoadingScreen />;
-    }
+  // Zero-Trust Authentication Gate: Every user must authenticate via Clerk
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
-    // 2. If the user is NOT authenticated, display the Global Authentication Gate
-    if (!isSignedIn) {
-      return <LoginScreen />;
-    }
+  if (!isSignedIn) {
+    return <LoginScreen />;
   }
 
   return (

@@ -37,6 +37,7 @@ class ScanResponse(BaseModel):
     """Complete forensic threat report returned by the scanning engine."""
     id: str
     created_at: datetime
+    user_id: Optional[str] = "system-historical"
     subject: str
     sender: str
     recipient: str
@@ -63,6 +64,7 @@ class HistoryScanItem(BaseModel):
     """Summarized scan record for detection history archive listing."""
     id: str
     created_at: datetime
+    user_id: Optional[str] = "system-historical"
     subject: str
     sender: str
     threat_level: str

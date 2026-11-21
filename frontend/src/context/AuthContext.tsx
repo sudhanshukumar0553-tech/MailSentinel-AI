@@ -7,7 +7,7 @@ import {
   AuthenticateWithRedirectCallback
 } from "@clerk/react";
 import { useSignIn, useSignUp } from "@clerk/react/legacy";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, ShieldAlert } from "lucide-react";
 import { setAuthTokenGetter, api } from "../api/client";
 import type { UserRole, AuthUserProfile } from "../types";
 
@@ -43,12 +43,12 @@ export interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Clerk authentication is safely disabled per project requirements
-const RAW_CLERK_KEY = "";
-const IS_CLERK_CONFIGURED = false;
+// Dynamic Clerk publishable key resolution from Vite environment
+const RAW_CLERK_KEY = (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "").trim();
+const IS_CLERK_CONFIGURED = Boolean(RAW_CLERK_KEY && !RAW_CLERK_KEY.startsWith("pk_test_your_"));
 
-// Autonomous Demo Mode active by default for direct evaluator access
-const IS_DEMO_MODE = true;
+// Demo mode is strictly restricted to local development mode AND explicit VITE_DEMO_MODE=true
+const IS_DEMO_MODE = import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE === "true";
 
 // Restricted Demo Analyst Profile for Interview Demonstrations
 export const DEMO_USER_PROFILE: AuthUserProfile = {
@@ -140,18 +140,20 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }, []);
 
   const [testSessionRole, setTestSessionRole] = useState<UserRole | null>(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && import.meta.env.DEV) {
       return (sessionStorage.getItem("mailsentinel_test_role") as UserRole) || null;
     }
     return null;
   });
 
-  const effectiveIsSignedIn = Boolean(isSignedIn || testSessionRole);
+  const effectiveIsSignedIn = Boolean(isSignedIn || (import.meta.env.DEV && testSessionRole));
 
   const switchDemoRole = useCallback((role: UserRole) => {
-    setTestSessionRole(role);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("mailsentinel_test_role", role);
+    if (import.meta.env.DEV) {
+      setTestSessionRole(role);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("mailsentinel_test_role", role);
+      }
     }
   }, []);
 
@@ -513,8 +515,30 @@ const DemoAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children })
 };
 
 /**
+ * Safe fallback screen displayed in production when Clerk publishable key is missing.
+ * Prevents unauthorized access or silent fallback into demo mode.
+ */
+const ClerkConfigMissingScreen: React.FC = () => (
+  <div className="min-h-screen flex items-center justify-center bg-[#080D1A] text-slate-100 p-6 font-sans">
+    <div className="max-w-md w-full p-8 rounded-2xl border border-rose-500/30 bg-[#0D1527] shadow-[0_0_50px_rgba(244,63,94,0.2)] text-center space-y-4">
+      <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 mx-auto flex items-center justify-center text-rose-400">
+        <ShieldAlert className="w-7 h-7" />
+      </div>
+      <h2 className="text-xl font-bold text-white">Authentication Configuration Required</h2>
+      <p className="text-sm text-slate-300 leading-relaxed">
+        MailSentinel AI operates under a strict Zero-Trust security model. End-user access requires live Clerk authentication.
+      </p>
+      <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-left font-mono text-xs text-slate-400 space-y-1.5">
+        <div className="text-cyan-400 font-semibold">Administrator Action Required:</div>
+        <div>Configure <code className="text-cyan-300">VITE_CLERK_PUBLISHABLE_KEY</code> in the Vercel Project Settings to activate Google OAuth and SOC authentication.</div>
+      </div>
+    </div>
+  </div>
+);
+
+/**
  * Universal Authentication Provider
- * Gracefully selects between Demo Mode, Clerk Live Provider, and Developer Fallback Provider.
+ * Gracefully selects between Demo Mode (local DEV only), Clerk Live Provider, and Developer Fallback Provider.
  */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (IS_DEMO_MODE) {
@@ -532,6 +556,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }
 
+  // In production, missing Clerk configuration fails safely and blocks all access
+  if (import.meta.env.PROD) {
+    return <ClerkConfigMissingScreen />;
+  }
+
+  // In local development, fallback to developer sandbox
   return <DevAuthProvider>{children}</DevAuthProvider>;
 };
 

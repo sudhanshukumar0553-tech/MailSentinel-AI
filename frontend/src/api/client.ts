@@ -19,9 +19,6 @@ export const API_BASE_URL = RAW_API_URL
   ? (RAW_API_URL.endsWith("/api/v1") ? RAW_API_URL : `${RAW_API_URL.replace(/\/+$/, "")}/api/v1`)
   : (import.meta.env.PROD ? "/api/v1" : "http://localhost:8000/api/v1");
 
-// Server-side authenticated analyst key for development & demo environment
-const DEFAULT_ANALYST_TOKEN = "Bearer mailsentinel-demo-analyst-key";
-
 let activeAuthTokenGetter: (() => Promise<string | null> | string | null) | null = null;
 
 /**
@@ -34,7 +31,7 @@ export function setAuthTokenGetter(getter: (() => Promise<string | null> | strin
 /**
  * Resolves current authorization header, prioritizing active Clerk session token.
  */
-export async function getAuthorizationHeader(): Promise<string> {
+export async function getAuthorizationHeader(): Promise<string | null> {
   if (activeAuthTokenGetter) {
     try {
       const token = await activeAuthTokenGetter();
@@ -42,10 +39,10 @@ export async function getAuthorizationHeader(): Promise<string> {
         return token.startsWith("Bearer ") ? token : `Bearer ${token}`;
       }
     } catch (e) {
-      console.warn("Failed to get auth token from active getter, using fallback:", e);
+      console.warn("Failed to get auth token from active getter:", e);
     }
   }
-  return DEFAULT_ANALYST_TOKEN;
+  return null;
 }
 
 async function request<T>(endpoint: string, options?: RequestInit, timeoutMs = 20000): Promise<T> {
@@ -55,15 +52,19 @@ async function request<T>(endpoint: string, options?: RequestInit, timeoutMs = 2
 
   try {
     const authHeader = await getAuthorizationHeader();
+    const reqHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(options?.headers as Record<string, string> || {})
+    };
+    if (authHeader) {
+      reqHeaders["Authorization"] = authHeader;
+    }
+
     const res = await fetch(url, {
       ...options,
       cache: "no-store",
       signal: options?.signal || controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": authHeader,
-        ...(options?.headers || {})
-      }
+      headers: reqHeaders
     });
 
     clearTimeout(timer);
@@ -145,7 +146,7 @@ export const api = {
         signal,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": authHeader
+          ...(authHeader ? { "Authorization": authHeader } : {})
         },
         body: JSON.stringify({
           email_content: content,
@@ -304,7 +305,7 @@ export const api = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": authHeader
+        ...(authHeader ? { "Authorization": authHeader } : {})
       },
       body: JSON.stringify({
         message,

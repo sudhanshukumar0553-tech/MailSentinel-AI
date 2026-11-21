@@ -7,6 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from backend.app.core.logging import logger
+from backend.app.core.auth import (
+    AuthenticatedUser,
+    get_current_user,
+    ROLE_CUSTOMER,
+    ROLE_SOC_ANALYST,
+    ROLE_ADMIN
+)
 from backend.app.db.session import get_db
 from backend.app.db.models.scan import ScanRecord
 from backend.app.schemas.scan import ScanResponse, DetectedUrlSchema, HistoryResponse, HistoryScanItem
@@ -20,10 +27,13 @@ async def list_scans(
     limit: int = Query(25, ge=1, le=100),
     offset: int = Query(0, ge=0),
     threat_level: Optional[str] = None,
+    all_users: bool = Query(False, description="Admin/Analyst: View all tenant scans including historical"),
+    current_user: AuthenticatedUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Retrieves paginated list of past email scans.
+    Enforces tenant isolation: Customers only see their own scans.
     Guarantees no browser caching, strict descending chronological ordering by UTC timestamp,
     and ISO 8601 UTC timestamps with explicit 'Z' suffix.
     """
@@ -31,9 +41,16 @@ async def list_scans(
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
 
-    stmt = select(ScanRecord).order_by(desc(ScanRecord.created_at), desc(ScanRecord.id)).offset(offset).limit(limit)
+    stmt = select(ScanRecord).order_by(desc(ScanRecord.created_at), desc(ScanRecord.id))
+
+    # Multi-tenant scoping: Customers see only their scans; Analysts/Admins can query all or own
+    if current_user.role == ROLE_CUSTOMER or not all_users:
+        stmt = stmt.where(ScanRecord.user_id == current_user.id)
+
     if threat_level:
         stmt = stmt.where(ScanRecord.threat_level == threat_level.upper())
+
+    stmt = stmt.offset(offset).limit(limit)
 
     try:
         result = await db.execute(stmt)
@@ -46,6 +63,7 @@ async def list_scans(
         HistoryScanItem(
             id=s.id,
             created_at=s.created_at,
+            user_id=getattr(s, "user_id", "system-historical"),
             subject=s.subject or "Untitled",
             sender=s.sender or "Unknown",
             threat_level=s.threat_level,
@@ -66,9 +84,14 @@ async def list_scans(
 
 
 @router.get("/{scan_id}", response_model=ScanResponse, status_code=status.HTTP_200_OK)
-async def get_scan_detail(scan_id: str, response: Response, db: AsyncSession = Depends(get_db)):
+async def get_scan_detail(
+    scan_id: str,
+    response: Response,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """
-    Retrieves complete forensic report for a specific scan by ID.
+    Retrieves complete forensic report for a specific scan by ID with ownership verification.
     """
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
@@ -78,6 +101,18 @@ async def get_scan_detail(scan_id: str, response: Response, db: AsyncSession = D
     scan = result.scalar_one_or_none()
     if not scan:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scan record not found.")
+
+    # Strict IDOR Defense: Customers can only inspect their own scans
+    scan_owner = getattr(scan, "user_id", "system-historical")
+    if current_user.role == ROLE_CUSTOMER and scan_owner != current_user.id:
+        logger.warning(
+            "IDOR attempt blocked: User %s attempted to inspect scan %s owned by %s",
+            current_user.id, scan_id, scan_owner
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have ownership of this scan record."
+        )
 
     urls = [
         DetectedUrlSchema(
@@ -119,6 +154,7 @@ async def get_scan_detail(scan_id: str, response: Response, db: AsyncSession = D
     return ScanResponse(
         id=scan.id,
         created_at=scan.created_at,
+        user_id=getattr(scan, "user_id", "system-historical"),
         subject=scan.subject or "Untitled Email",
         sender=scan.sender or "Undisclosed Sender",
         recipient=scan.recipient or "Undisclosed Recipient",

@@ -35,6 +35,11 @@ class ScanRecord(Base):
         default=now_utc,
         index=True
     )
+    user_id: Mapped[str] = mapped_column(
+        String(64),
+        index=True,
+        default="system-historical"
+    )
 
     # Email Metadata
     subject: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)

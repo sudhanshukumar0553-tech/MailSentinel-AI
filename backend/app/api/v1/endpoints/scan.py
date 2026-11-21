@@ -9,6 +9,7 @@ Executes the complete multi-tier detection pipeline:
 5. Unified Risk Scoring & Database Persistence
 """
 
+from backend.app.core.auth import AuthenticatedUser, get_current_user
 from backend.app.core.time import now_utc
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,10 +27,14 @@ router = APIRouter(prefix="/scan", tags=["Scanning & Detection"])
 
 
 @router.post("", response_model=ScanResponse, status_code=status.HTTP_200_OK)
-async def scan_email(payload: ScanRequest, db: AsyncSession = Depends(get_db)):
+async def scan_email(
+    payload: ScanRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """
     Submits an email for instant multi-engine threat analysis.
-    Stores the forensic record in the database and returns a complete risk report.
+    Stores the forensic record in the database and associates it with the authenticated Clerk user.
     """
     # 1. Parse Email Content & Transport Headers
     parsed = parse_email_input(payload.raw_content)
@@ -79,6 +84,7 @@ async def scan_email(payload: ScanRequest, db: AsyncSession = Depends(get_db)):
     try:
         scan_entity = ScanRecord(
             created_at=now_utc(),
+            user_id=current_user.id,
             subject=subject or "Untitled Email",
             sender=sender or "Undisclosed Sender",
             recipient=recipient or "Undisclosed Recipient",
@@ -140,6 +146,7 @@ async def scan_email(payload: ScanRequest, db: AsyncSession = Depends(get_db)):
     return ScanResponse(
         id=scan_entity.id,
         created_at=scan_entity.created_at,
+        user_id=scan_entity.user_id,
         subject=scan_entity.subject or "Untitled",
         sender=scan_entity.sender or "Unknown",
         recipient=scan_entity.recipient or "Unknown",

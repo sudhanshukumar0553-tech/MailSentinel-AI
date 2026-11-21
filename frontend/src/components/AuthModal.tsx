@@ -264,8 +264,8 @@ export const AuthModal: React.FC = () => {
             )}
           </form>
 
-          {/* Sandbox Role Switcher Section (Active in Sandbox / Dev mode) */}
-          {!isClerkConfigured && (
+          {/* Sandbox Role Switcher Section (Active strictly in Local Dev Sandbox mode) */}
+          {import.meta.env.DEV && !isClerkConfigured && (
             <div className="pt-2 border-t border-slate-800 space-y-2">
               <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
                 <span className="flex items-center gap-1">
