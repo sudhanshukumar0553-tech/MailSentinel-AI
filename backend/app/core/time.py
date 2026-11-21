@@ -142,7 +142,13 @@ class UTCDateTime(TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value is None:
             return None
-        return ensure_utc(value)
+        dt = ensure_utc(value)
+        if dt is None:
+            return None
+        if dialect and dialect.name == "postgresql":
+            # asyncpg requires offset-naive datetime when binding to TIMESTAMP WITHOUT TIME ZONE
+            return dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
 
     def process_result_value(self, value, dialect):
         if value is None:

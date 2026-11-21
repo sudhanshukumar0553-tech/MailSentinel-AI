@@ -10,6 +10,7 @@ Includes:
 import json
 import pytest
 from httpx import AsyncClient, ASGITransport
+from backend.app.core.config import settings
 from backend.app.main import app
 from backend.app.db.session import init_db
 from backend.app.ai.chat_tools import (

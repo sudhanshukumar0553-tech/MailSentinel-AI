@@ -52,8 +52,11 @@ backend/.env.*
 # Databases
 *.db
 !mailsentinel.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+backups/
 
 # Node / Frontend
 node_modules/

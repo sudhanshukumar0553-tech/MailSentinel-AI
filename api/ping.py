@@ -20,7 +20,7 @@ class handler(BaseHTTPRequestHandler):
 
         # Check dependencies
         modules_status = {}
-        for mod in ["fastapi", "pydantic", "pydantic_settings", "sqlalchemy", "aiosqlite", "numpy", "joblib", "sklearn", "google.genai", "greenlet"]:
+        for mod in ["fastapi", "pydantic", "pydantic_settings", "sqlalchemy", "asyncpg", "aiosqlite", "numpy", "joblib", "sklearn", "google.genai", "greenlet"]:
             try:
                 __import__(mod)
                 modules_status[mod] = "OK"

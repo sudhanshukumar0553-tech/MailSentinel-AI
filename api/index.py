@@ -31,18 +31,36 @@ is_vercel = bool(
 )
 
 if is_vercel:
-    tmp_dir = Path(tempfile.gettempdir())
-    tmp_db = tmp_dir / "mailsentinel.db"
-    seed_db = ROOT_DIR / "mailsentinel.db"
+    current_db_url = os.environ.get("DATABASE_URL", "").strip()
+    if "postgres" in current_db_url:
+        # Normalize to asyncpg dialect if needed for Neon / Vercel integrations
+        if current_db_url.startswith("postgres://"):
+            os.environ["DATABASE_URL"] = "postgresql+asyncpg://" + current_db_url[len("postgres://"):]
+        elif current_db_url.startswith("postgresql://") and not current_db_url.startswith("postgresql+asyncpg://"):
+            os.environ["DATABASE_URL"] = "postgresql+asyncpg://" + current_db_url[len("postgresql://"):]
+    else:
+        # Strict Production Guard: Prevent silent fallback to temporary SQLite in production
+        is_production = (
+            os.environ.get("VERCEL_ENV") == "production"
+            or os.environ.get("ENVIRONMENT", "").lower() == "production"
+        )
+        if is_production and not os.environ.get("ALLOW_SQLITE_FALLBACK"):
+            raise RuntimeError(
+                "CRITICAL PRODUCTION CONFIGURATION ERROR: DATABASE_URL is not configured in Vercel environment variables. "
+                "MailSentinel AI requires Neon PostgreSQL in production. Silent SQLite fallback is blocked to protect data persistence. "
+                "Configure DATABASE_URL in Vercel Project Settings."
+            )
 
-    if seed_db.exists() and not tmp_db.exists():
-        try:
-            shutil.copy2(seed_db, tmp_db)
-        except Exception:
-            pass
+        tmp_dir = Path(tempfile.gettempdir())
+        tmp_db = tmp_dir / "mailsentinel.db"
+        seed_db = ROOT_DIR / "mailsentinel.db"
 
-    current_db_url = os.environ.get("DATABASE_URL", "")
-    if not current_db_url or "sqlite" in current_db_url:
+        if seed_db.exists() and not tmp_db.exists():
+            try:
+                shutil.copy2(seed_db, tmp_db)
+            except Exception:
+                pass
+
         posix_path = tmp_db.as_posix()
         if not posix_path.startswith("/"):
             posix_path = f"/{posix_path}"
