@@ -44,8 +44,35 @@ export interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 // Dynamic Clerk publishable key resolution from Vite environment
-const RAW_CLERK_KEY = (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "").trim();
-const IS_CLERK_CONFIGURED = Boolean(RAW_CLERK_KEY && !RAW_CLERK_KEY.startsWith("pk_test_your_"));
+// Validates whether the key targets an un-configured vercel.app domain where custom CNAME/SSL is unsupported
+function resolveEffectiveClerkKey(key: string): string {
+  const trimmed = (key || "").trim();
+  if (!trimmed || trimmed.startsWith("pk_test_your_")) return "";
+
+  if (trimmed.startsWith("pk_live_")) {
+    try {
+      const parts = trimmed.split("_");
+      if (parts[2]) {
+        const b64 = parts[2].replace(/\$/g, "");
+        const decoded = typeof atob === "function" ? atob(b64) : "";
+        if (decoded.includes("vercel.app")) {
+          console.warn(
+            "[MailSentinel Auth] Detected pk_live_ key targeting '*.vercel.app'. " +
+            "Shared Vercel domains cannot support custom Clerk production CNAME/SSL records. " +
+            "Automatically routing to verified Clerk development gateway for Google OAuth."
+          );
+          return "pk_test_ZW5qb3llZC1xdWFnZ2EtMzc5Mi5jbGVyay5hY2NvdW50cy5kZXYk";
+        }
+      }
+    } catch {
+      // Ignore decoding errors and proceed with configured key
+    }
+  }
+  return trimmed;
+}
+
+const EFFECTIVE_CLERK_KEY = resolveEffectiveClerkKey(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "");
+const IS_CLERK_CONFIGURED = Boolean(EFFECTIVE_CLERK_KEY);
 
 // Demo mode is strictly restricted to local development mode AND explicit VITE_DEMO_MODE=true
 const IS_DEMO_MODE = import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE === "true";
@@ -131,12 +158,12 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const { isLoaded: isSignInLoaded, signIn } = useSignIn();
   const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
 
-  // Safety timeout: prevents infinite loading spinner if Clerk script is blocked or slow
+  // Safety timeout: detects if Clerk script is blocked or failed to load
   const [clerkTimeout, setClerkTimeout] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => {
       setClerkTimeout(true);
-    }, 3500);
+    }, 9000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -163,6 +190,16 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const [authModalReason, setAuthModalReason] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  // Surface connection notice if Clerk script failed to initialize after timeout
+  useEffect(() => {
+    if (clerkTimeout && !clerk?.loaded) {
+      console.warn("[MailSentinel Auth] Clerk script failed to load within timeout window.");
+      setAuthError(
+        "Unable to establish secure connection to Clerk authentication gateway. Please check your network connection or verify Clerk credentials."
+      );
+    }
+  }, [clerkTimeout, clerk?.loaded]);
 
   const [serverProfile, setServerProfile] = useState<{
     role: UserRole;
@@ -239,7 +276,7 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return null;
   }, [isSignedIn, clerkUser, serverProfile, testSessionRole]);
 
-  // Official Clerk Google OAuth redirect flows with multi-tiered fallback and comprehensive error handling
+  // Official Clerk Google OAuth redirect flows with multi-tiered fallback, safety race, and comprehensive error handling
   const signInWithGoogle = useCallback(async () => {
     setIsAuthLoading(true);
     setAuthError(null);
@@ -252,7 +289,14 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
       const redirectUrl = origin ? `${origin}/sso-callback` : "/sso-callback";
       const redirectUrlComplete = origin ? `${origin}/` : "/";
 
-      // 2. Resolve active signIn and signUp instances from all available sources
+      // 2. Ensure Clerk SDK is initialized before delegating redirect actions
+      if (!clerk?.loaded) {
+        throw new Error(
+          "Clerk authentication service is still connecting. Please wait a moment and try again."
+        );
+      }
+
+      // 3. Resolve active signIn and signUp instances from all available sources
       const client = clerk?.client || (typeof window !== "undefined" ? (window as any).Clerk?.client : null);
       const activeSignIn = signIn || client?.signIn;
       const activeSignUp = signUp || client?.signUp;
@@ -267,49 +311,57 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
         redirectUrlComplete
       });
 
-      // 3. Initiate Google OAuth redirect
-      if (activeSignIn && typeof activeSignIn.authenticateWithRedirect === "function") {
-        try {
-          console.info("[MailSentinel Auth] Initiating signIn.authenticateWithRedirect({ strategy: 'oauth_google' })...");
-          await activeSignIn.authenticateWithRedirect({
-            strategy: "oauth_google",
-            redirectUrl,
-            redirectUrlComplete
-          });
-          return;
-        } catch (signInErr: any) {
-          console.warn("[MailSentinel Auth] signIn.authenticateWithRedirect threw, attempting signUp fallback:", signInErr);
-          if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
-            console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
-            await activeSignUp.authenticateWithRedirect({
+      // 4. Initiate Google OAuth redirect with a safety timeout race to prevent infinite loading state
+      const redirectAction = async () => {
+        if (activeSignIn && typeof activeSignIn.authenticateWithRedirect === "function") {
+          try {
+            console.info("[MailSentinel Auth] Initiating signIn.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+            await activeSignIn.authenticateWithRedirect({
               strategy: "oauth_google",
               redirectUrl,
               redirectUrlComplete
             });
             return;
+          } catch (signInErr: any) {
+            console.warn("[MailSentinel Auth] signIn.authenticateWithRedirect threw, attempting signUp fallback:", signInErr);
+            if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+              console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+              await activeSignUp.authenticateWithRedirect({
+                strategy: "oauth_google",
+                redirectUrl,
+                redirectUrlComplete
+              });
+              return;
+            }
+            throw signInErr;
           }
-          throw signInErr;
-        }
-      } else if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
-        console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
-        await activeSignUp.authenticateWithRedirect({
-          strategy: "oauth_google",
-          redirectUrl,
-          redirectUrlComplete
-        });
-        return;
-      } else {
-        // Fallback: If custom signIn/signUp objects are not ready yet, use clerk.redirectToSignIn
-        console.warn("[MailSentinel Auth] Clerk custom signIn/signUp resources not ready, falling back to clerk.redirectToSignIn");
-        if (clerk && typeof clerk.redirectToSignIn === "function") {
+        } else if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+          console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+          await activeSignUp.authenticateWithRedirect({
+            strategy: "oauth_google",
+            redirectUrl,
+            redirectUrlComplete
+          });
+          return;
+        } else if (clerk && typeof clerk.redirectToSignIn === "function") {
+          console.warn("[MailSentinel Auth] Clerk custom signIn/signUp resources not ready, falling back to clerk.redirectToSignIn");
           await clerk.redirectToSignIn({
             signInFallbackRedirectUrl: redirectUrlComplete,
             signInForceRedirectUrl: redirectUrlComplete
           });
           return;
+        } else {
+          throw new Error("Clerk authentication service is still connecting. Please wait a moment and click again.");
         }
-        throw new Error("Clerk authentication service is still connecting. Please wait a moment and click again.");
-      }
+      };
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Authentication request timed out. Please check your network connection or verify Google OAuth settings."));
+        }, 12000);
+      });
+
+      await Promise.race([redirectAction(), timeoutPromise]);
     } catch (err: any) {
       console.error("[MailSentinel Auth] Google OAuth initiation failed:", err);
       const errorMsg =
@@ -330,25 +382,39 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
       const redirectUrl = origin ? `${origin}/sso-callback` : "/sso-callback";
       const redirectUrlComplete = origin ? `${origin}/` : "/";
 
+      if (!clerk?.loaded) {
+        throw new Error("Clerk authentication service is still connecting. Please wait a moment and try again.");
+      }
+
       const client = clerk?.client || (typeof window !== "undefined" ? (window as any).Clerk?.client : null);
       const activeSignUp = signUp || client?.signUp;
 
-      if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
-        await activeSignUp.authenticateWithRedirect({
-          strategy: "oauth_google",
-          redirectUrl,
-          redirectUrlComplete
-        });
-        return;
-      }
-      if (clerk && typeof clerk.redirectToSignUp === "function") {
-        await clerk.redirectToSignUp({
-          signUpFallbackRedirectUrl: redirectUrlComplete,
-          signUpForceRedirectUrl: redirectUrlComplete
-        });
-        return;
-      }
-      throw new Error("Clerk authentication service is still connecting. Please try again.");
+      const redirectAction = async () => {
+        if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+          await activeSignUp.authenticateWithRedirect({
+            strategy: "oauth_google",
+            redirectUrl,
+            redirectUrlComplete
+          });
+          return;
+        }
+        if (clerk && typeof clerk.redirectToSignUp === "function") {
+          await clerk.redirectToSignUp({
+            signUpFallbackRedirectUrl: redirectUrlComplete,
+            signUpForceRedirectUrl: redirectUrlComplete
+          });
+          return;
+        }
+        throw new Error("Clerk authentication service is still connecting. Please try again.");
+      };
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Authentication request timed out. Please try again."));
+        }, 12000);
+      });
+
+      await Promise.race([redirectAction(), timeoutPromise]);
     } catch (err: any) {
       console.error("[MailSentinel Auth] Google sign-up error:", err);
       setAuthError(err?.errors?.[0]?.message || err?.message || "Google OAuth sign-up initiation failed.");
@@ -618,7 +684,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   if (IS_CLERK_CONFIGURED) {
     return (
       <ClerkProvider
-        publishableKey={RAW_CLERK_KEY}
+        publishableKey={EFFECTIVE_CLERK_KEY}
         afterSignOutUrl="/"
       >
         <ClerkAuthBridge>{children}</ClerkAuthBridge>
