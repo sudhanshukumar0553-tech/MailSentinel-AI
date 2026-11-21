@@ -126,7 +126,8 @@ const DEMO_PROFILES: Record<UserRole, AuthUserProfile> = {
 const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const { user: clerkUser } = useUser();
-  const { signOut: clerkSignOut } = useClerk();
+  const clerk = useClerk();
+  const clerkSignOut = clerk.signOut;
   const { isLoaded: isSignInLoaded, signIn } = useSignIn();
   const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
 
@@ -238,53 +239,122 @@ const ClerkAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return null;
   }, [isSignedIn, clerkUser, serverProfile, testSessionRole]);
 
-  // Official Clerk Google OAuth redirect flows
+  // Official Clerk Google OAuth redirect flows with multi-tiered fallback and comprehensive error handling
   const signInWithGoogle = useCallback(async () => {
-    if (!isSignInLoaded || !signIn) return;
     setIsAuthLoading(true);
     setAuthError(null);
+
     try {
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/"
+      console.info("[MailSentinel Auth] Google login button clicked. Resolving Clerk client resources...");
+
+      // 1. Resolve redirect targets (ensure absolute URLs so external OAuth providers redirect reliably)
+      const origin = typeof window !== "undefined" && window.location.origin ? window.location.origin : "";
+      const redirectUrl = origin ? `${origin}/sso-callback` : "/sso-callback";
+      const redirectUrlComplete = origin ? `${origin}/` : "/";
+
+      // 2. Resolve active signIn and signUp instances from all available sources
+      const client = clerk?.client || (typeof window !== "undefined" ? (window as any).Clerk?.client : null);
+      const activeSignIn = signIn || client?.signIn;
+      const activeSignUp = signUp || client?.signUp;
+
+      console.info("[MailSentinel Auth] Discovered auth targets:", {
+        hasActiveSignIn: Boolean(activeSignIn),
+        hasActiveSignUp: Boolean(activeSignUp),
+        isSignInLoaded,
+        isSignUpLoaded,
+        clerkLoaded: clerk?.loaded,
+        redirectUrl,
+        redirectUrlComplete
       });
-    } catch (err: any) {
-      console.warn("Clerk Google Sign In redirected or failed, trying signup fallback:", err);
-      if (signUp && isSignUpLoaded) {
+
+      // 3. Initiate Google OAuth redirect
+      if (activeSignIn && typeof activeSignIn.authenticateWithRedirect === "function") {
         try {
-          await signUp.authenticateWithRedirect({
+          console.info("[MailSentinel Auth] Initiating signIn.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+          await activeSignIn.authenticateWithRedirect({
             strategy: "oauth_google",
-            redirectUrl: "/sso-callback",
-            redirectUrlComplete: "/"
+            redirectUrl,
+            redirectUrlComplete
           });
           return;
-        } catch (signUpErr: any) {
-          setAuthError(signUpErr?.errors?.[0]?.message || "Google OAuth sign-up initiation failed.");
+        } catch (signInErr: any) {
+          console.warn("[MailSentinel Auth] signIn.authenticateWithRedirect threw, attempting signUp fallback:", signInErr);
+          if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+            console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+            await activeSignUp.authenticateWithRedirect({
+              strategy: "oauth_google",
+              redirectUrl,
+              redirectUrlComplete
+            });
+            return;
+          }
+          throw signInErr;
         }
+      } else if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+        console.info("[MailSentinel Auth] Initiating signUp.authenticateWithRedirect({ strategy: 'oauth_google' })...");
+        await activeSignUp.authenticateWithRedirect({
+          strategy: "oauth_google",
+          redirectUrl,
+          redirectUrlComplete
+        });
+        return;
       } else {
-        setAuthError(err?.errors?.[0]?.message || "Google OAuth initiation failed.");
+        // Fallback: If custom signIn/signUp objects are not ready yet, use clerk.redirectToSignIn
+        console.warn("[MailSentinel Auth] Clerk custom signIn/signUp resources not ready, falling back to clerk.redirectToSignIn");
+        if (clerk && typeof clerk.redirectToSignIn === "function") {
+          await clerk.redirectToSignIn({
+            signInFallbackRedirectUrl: redirectUrlComplete,
+            signInForceRedirectUrl: redirectUrlComplete
+          });
+          return;
+        }
+        throw new Error("Clerk authentication service is still connecting. Please wait a moment and click again.");
       }
+    } catch (err: any) {
+      console.error("[MailSentinel Auth] Google OAuth initiation failed:", err);
+      const errorMsg =
+        err?.errors?.[0]?.longMessage ||
+        err?.errors?.[0]?.message ||
+        err?.message ||
+        "Failed to initiate Google authentication. Please verify Google OAuth is enabled in Clerk.";
+      setAuthError(errorMsg);
       setIsAuthLoading(false);
     }
-  }, [isSignInLoaded, signIn, isSignUpLoaded, signUp]);
+  }, [signIn, signUp, isSignInLoaded, isSignUpLoaded, clerk]);
 
   const signUpWithGoogle = useCallback(async () => {
-    if (!isSignUpLoaded || !signUp) return;
     setIsAuthLoading(true);
     setAuthError(null);
     try {
-      await signUp.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/"
-      });
+      const origin = typeof window !== "undefined" && window.location.origin ? window.location.origin : "";
+      const redirectUrl = origin ? `${origin}/sso-callback` : "/sso-callback";
+      const redirectUrlComplete = origin ? `${origin}/` : "/";
+
+      const client = clerk?.client || (typeof window !== "undefined" ? (window as any).Clerk?.client : null);
+      const activeSignUp = signUp || client?.signUp;
+
+      if (activeSignUp && typeof activeSignUp.authenticateWithRedirect === "function") {
+        await activeSignUp.authenticateWithRedirect({
+          strategy: "oauth_google",
+          redirectUrl,
+          redirectUrlComplete
+        });
+        return;
+      }
+      if (clerk && typeof clerk.redirectToSignUp === "function") {
+        await clerk.redirectToSignUp({
+          signUpFallbackRedirectUrl: redirectUrlComplete,
+          signUpForceRedirectUrl: redirectUrlComplete
+        });
+        return;
+      }
+      throw new Error("Clerk authentication service is still connecting. Please try again.");
     } catch (err: any) {
-      console.error("Clerk Google Sign Up initiation failed:", err);
-      setAuthError(err?.errors?.[0]?.message || "Google OAuth sign-up initiation failed.");
+      console.error("[MailSentinel Auth] Google sign-up error:", err);
+      setAuthError(err?.errors?.[0]?.message || err?.message || "Google OAuth sign-up initiation failed.");
       setIsAuthLoading(false);
     }
-  }, [isSignUpLoaded, signUp]);
+  }, [signUp, clerk]);
 
   const openSignIn = useCallback(() => {
     setAuthModalMode("sign-in");

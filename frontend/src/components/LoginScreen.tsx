@@ -110,7 +110,15 @@ export const LoginScreen: React.FC = () => {
                 </span>
               </div>
               <button
-                onClick={() => signInWithGoogle()}
+                type="button"
+                onClick={async () => {
+                  console.info("[MailSentinel UI] 'Continue with Google' button clicked.");
+                  try {
+                    await signInWithGoogle();
+                  } catch (e: any) {
+                    console.error("[MailSentinel UI] Click handler caught error:", e);
+                  }
+                }}
                 disabled={isAuthLoading}
                 className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl border font-bold text-sm transition-all duration-200 cursor-pointer shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed ${
                   isDark
@@ -141,13 +149,17 @@ export const LoginScreen: React.FC = () => {
                   </svg>
                 )}
                 <span>
-                  {isAuthLoading ? "Redirecting to Google Identity..." : "Continue with Google"}
+                  {isAuthLoading ? "Connecting to Google Identity..." : "Continue with Google"}
                 </span>
               </button>
 
               {authError && (
-                <div className="mt-3 p-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs text-center">
-                  {authError}
+                <div className="mt-3 p-3 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 text-xs flex items-start gap-2.5">
+                  <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+                  <div className="text-left leading-relaxed">
+                    <span className="font-semibold block mb-0.5 text-rose-200">Authentication Notice</span>
+                    <span>{authError}</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -230,6 +242,7 @@ export const LoginScreen: React.FC = () => {
           >
             {/* Prominent Google OAuth Simulation Button */}
             <button
+              type="button"
               onClick={() => signInWithGoogle()}
               disabled={isAuthLoading}
               className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl border font-bold text-sm transition-all duration-200 cursor-pointer shadow-md hover:scale-[1.01] active:scale-[0.99] ${
