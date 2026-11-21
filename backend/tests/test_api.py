@@ -5,6 +5,14 @@ End-to-End API Integration Tests for MailSentinel AI endpoints.
 import pytest
 from httpx import ASGITransport, AsyncClient
 from backend.app.main import app
+from backend.app.db.session import init_db
+
+AUTH_HEADERS = {"Authorization": "Bearer mailsentinel-soc-analyst-key-alpha"}
+
+
+@pytest.fixture(autouse=True)
+async def setup_test_db():
+    await init_db()
 
 
 @pytest.mark.asyncio
@@ -16,7 +24,7 @@ async def test_scan_email_api_endpoint():
             "subject": "Urgent Security Verification",
             "sender": "alert@paypa1-security.xyz"
         }
-        response = await client.post("/api/v1/scan", json=payload)
+        response = await client.post("/api/v1/scan", json=payload, headers=AUTH_HEADERS)
         assert response.status_code == 200
         data = response.json()
         assert "id" in data
@@ -31,14 +39,14 @@ async def test_analytics_and_models_endpoints():
     """Verify analytics overview and model benchmark retrieval."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Analytics
-        analytics_res = await client.get("/api/v1/analytics/overview")
+        analytics_res = await client.get("/api/v1/analytics/overview", headers=AUTH_HEADERS)
         assert analytics_res.status_code == 200
         analytics_data = analytics_res.json()
         assert "total_scans" in analytics_data
         assert "threat_distribution" in analytics_data
 
         # Models
-        models_res = await client.get("/api/v1/models/benchmarks")
+        models_res = await client.get("/api/v1/models/benchmarks", headers=AUTH_HEADERS)
         assert models_res.status_code == 200
         models_data = models_res.json()
         assert "models" in models_data
@@ -52,7 +60,7 @@ async def test_agent_investigate_api_endpoint():
             "email_content": "Wire $5000 to this offshore account immediately to claim your lottery winnings.",
             "raw_headers": "none"
         }
-        response = await client.post("/api/v1/agent/investigate", json=payload)
+        response = await client.post("/api/v1/agent/investigate", json=payload, headers=AUTH_HEADERS)
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "completed"

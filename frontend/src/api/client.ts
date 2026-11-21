@@ -14,10 +14,23 @@ import type {
   UserProfileResponse
 } from "../types";
 
-const RAW_API_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").trim();
-export const API_BASE_URL = RAW_API_URL
-  ? (RAW_API_URL.endsWith("/api/v1") ? RAW_API_URL : `${RAW_API_URL.replace(/\/+$/, "")}/api/v1`)
-  : (import.meta.env.PROD ? "/api/v1" : "http://localhost:8000/api/v1");
+function resolveApiBaseUrl(): string {
+  const raw = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").trim();
+  const isBrowser = typeof window !== "undefined";
+  const isHostedDomain = isBrowser && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+  
+  // If hosted on Vercel or production domain, never allow localhost fallback
+  if (isHostedDomain && (raw.includes("localhost") || raw.includes("127.0.0.1") || !raw)) {
+    return "/api/v1";
+  }
+
+  if (raw) {
+    return raw.endsWith("/api/v1") ? raw : `${raw.replace(/\/+$/, "")}/api/v1`;
+  }
+  return import.meta.env.PROD ? "/api/v1" : "http://localhost:8000/api/v1";
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 let activeAuthTokenGetter: (() => Promise<string | null> | string | null) | null = null;
 
@@ -73,7 +86,10 @@ async function request<T>(endpoint: string, options?: RequestInit, timeoutMs = 2
       const errorBody = await res.json().catch(() => ({}));
       const msg = errorBody.detail || errorBody.message || `HTTP ${res.status}: ${res.statusText}`;
       if (res.status === 401) {
-        throw new Error("Analyst authentication error: Valid server credentials required.");
+        const detailMsg = typeof msg === "string" && msg && !msg.startsWith("HTTP 401")
+          ? msg
+          : "Authentication required. Please sign in with your authorized analyst account.";
+        throw new Error(detailMsg);
       } else if (res.status === 422) {
         throw new Error(`Validation error: ${typeof msg === 'string' ? msg : JSON.stringify(msg)}`);
       } else if (res.status === 500) {

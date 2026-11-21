@@ -146,6 +146,20 @@ async def init_db() -> None:
                     logger.info("Added missing 'analyst_id' column to chat_sessions table.")
                 except Exception:
                     pass
+                try:
+                    await conn.execute(text("ALTER TABLE scans ADD COLUMN user_id VARCHAR(64) DEFAULT 'system-historical'"))
+                    logger.info("Added missing 'user_id' column to scans table.")
+                except Exception:
+                    pass
+            else:
+                try:
+                    await conn.execute(text("ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS analyst_id VARCHAR(64) DEFAULT 'analyst-default-dev'"))
+                except Exception as err:
+                    logger.warning("Postgres schema update warning for chat_sessions: %s", err)
+                try:
+                    await conn.execute(text("ALTER TABLE scans ADD COLUMN IF NOT EXISTS user_id VARCHAR(64) DEFAULT 'system-historical'"))
+                except Exception as err:
+                    logger.warning("Postgres schema update warning for scans: %s", err)
         _DB_INITIALIZED = True
         logger.info("Database tables initialized successfully.")
     except Exception as exc:

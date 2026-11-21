@@ -71,9 +71,10 @@ class Settings(BaseSettings):
 
     # Enterprise Clerk Authentication Configuration
     CLERK_SECRET_KEY: str = ""
-    CLERK_PUBLISHABLE_KEY: str = ""
-    CLERK_ISSUER: str = ""
+    CLERK_PUBLISHABLE_KEY: str = "pk_test_ZW5qb3llZC1xdWFnZ2EtMzc5Mi5jbGVyay5hY2NvdW50cy5kZXYk"
+    CLERK_ISSUER: str = "https://enjoyed-quagga-3792.clerk.accounts.dev"
     CLERK_AUTHORIZED_PARTIES: Union[str, List[str]] = [
+        "https://mailsentinel-ai-sigma.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173"
@@ -92,18 +93,38 @@ class Settings(BaseSettings):
     MAX_EMAIL_BODY_LENGTH: int = 1_000_000  # 1MB limit
     MAX_AGENT_STEPS: int = 5  # Hard-capped steps to avoid infinite loops
 
+    @field_validator("CLERK_ISSUER", mode="after")
+    @classmethod
+    def resolve_clerk_issuer(cls, v: str) -> str:
+        """
+        Normalizes CLERK_ISSUER. If empty or invalid vercel.app domain,
+        falls back to verified project Clerk accounts gateway.
+        """
+        v_clean = (v or "").strip().rstrip("/")
+        if not v_clean or "vercel.app" in v_clean:
+            return "https://enjoyed-quagga-3792.clerk.accounts.dev"
+        return v_clean
+
     @field_validator("CLERK_AUTHORIZED_PARTIES", mode="before")
     @classmethod
     def assemble_authorized_parties(cls, v: Union[str, List[str]]) -> List[str]:
-        """Ensures CLERK_AUTHORIZED_PARTIES is always parsed as a list of strings."""
+        """Ensures CLERK_AUTHORIZED_PARTIES is always parsed as a list of strings and contains production Vercel URL."""
+        parties = []
         if isinstance(v, str):
             if v.startswith("[") and v.endswith("]"):
                 try:
-                    return json.loads(v)
+                    parties = json.loads(v)
                 except Exception:
-                    pass
-            return [party.strip() for party in v.split(",") if party.strip()]
-        return v
+                    parties = [party.strip() for party in v.split(",") if party.strip()]
+            else:
+                parties = [party.strip() for party in v.split(",") if party.strip()]
+        elif isinstance(v, list):
+            parties = list(v)
+
+        prod_party = "https://mailsentinel-ai-sigma.vercel.app"
+        if prod_party not in parties:
+            parties.append(prod_party)
+        return parties
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

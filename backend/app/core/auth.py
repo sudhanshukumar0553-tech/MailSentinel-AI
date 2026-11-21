@@ -89,52 +89,75 @@ VALID_ANALYST_CREDENTIALS: Dict[str, AuthenticatedUser] = {
 class ClerkJwksManager:
     """
     Manages in-memory caching and fetching of Clerk JWKS public keys.
-    Prevents repeated network queries while respecting cache TTLs.
+    Prevents repeated network queries while respecting cache TTLs and supporting key rotation.
     """
     def __init__(self):
-        self._cached_jwks: Optional[Dict[str, Any]] = None
-        self._cache_timestamp: float = 0.0
+        self._cached_jwks: Dict[str, Dict[str, Any]] = {}
+        self._cache_timestamp: Dict[str, float] = {}
         self._test_jwks: Optional[Dict[str, Any]] = None
 
     def set_test_jwks(self, jwks: Optional[Dict[str, Any]]) -> None:
         """Injects test JWKS for unit testing without live network calls."""
         self._test_jwks = jwks
 
-    async def get_jwks(self) -> Dict[str, Any]:
+    def clear_cache(self, token_iss: Optional[str] = None) -> None:
+        """Clears cached JWKS to force a fresh network fetch on key rotation."""
+        jwks_url = self._resolve_jwks_url(token_iss)
+        if jwks_url and jwks_url in self._cached_jwks:
+            del self._cached_jwks[jwks_url]
+            self._cache_timestamp[jwks_url] = 0.0
+
+    async def get_jwks(self, token_iss: Optional[str] = None) -> Dict[str, Any]:
         """Returns the current JWKS, fetching from Clerk if cache is expired."""
         if self._test_jwks is not None:
             return self._test_jwks
 
-        now = time.time()
-        if self._cached_jwks and (now - self._cache_timestamp < settings.CLERK_JWKS_CACHE_TTL_SECONDS):
-            return self._cached_jwks
-
-        jwks_url = self._resolve_jwks_url()
+        jwks_url = self._resolve_jwks_url(token_iss)
         if not jwks_url:
             return {"keys": []}
+
+        now = time.time()
+        cached = self._cached_jwks.get(jwks_url)
+        last_time = self._cache_timestamp.get(jwks_url, 0.0)
+
+        if cached and (now - last_time < settings.CLERK_JWKS_CACHE_TTL_SECONDS):
+            return cached
 
         try:
             async with httpx.AsyncClient(timeout=8.0) as client:
                 res = await client.get(jwks_url)
                 if res.status_code == 200:
-                    self._cached_jwks = res.json()
-                    self._cache_timestamp = now
-                    logger.info("Successfully refreshed Clerk JWKS keys.")
-                    return self._cached_jwks
+                    data = res.json()
+                    self._cached_jwks[jwks_url] = data
+                    self._cache_timestamp[jwks_url] = now
+                    logger.info("Successfully refreshed Clerk JWKS keys from %s", jwks_url)
+                    return data
                 else:
-                    logger.error("Failed to fetch Clerk JWKS: HTTP %d", res.status_code)
+                    logger.error("Failed to fetch Clerk JWKS from %s: HTTP %d", jwks_url, res.status_code)
         except Exception as exc:
-            logger.error("Error communicating with Clerk JWKS endpoint: %s", exc)
+            logger.error("Error communicating with Clerk JWKS endpoint (%s): %s", jwks_url, exc)
 
-        return self._cached_jwks or {"keys": []}
+        return self._cached_jwks.get(jwks_url) or {"keys": []}
 
-    def _resolve_jwks_url(self) -> Optional[str]:
-        """Constructs the JWKS URL based on configured settings or derives from publishable key."""
+    def _resolve_jwks_url(self, token_iss: Optional[str] = None) -> Optional[str]:
+        """Constructs the JWKS URL based on token issuer, configured settings, or publishable key."""
+        # 1. If token issuer is a verified Clerk instance, use it directly
+        if token_iss:
+            clean_iss = token_iss.rstrip("/")
+            if (
+                clean_iss == "https://enjoyed-quagga-3792.clerk.accounts.dev"
+                or (settings.CLERK_ISSUER and clean_iss == settings.CLERK_ISSUER.rstrip("/"))
+                or (clean_iss.startswith("https://") and clean_iss.endswith(".clerk.accounts.dev"))
+            ):
+                return f"{clean_iss}/.well-known/jwks.json"
+
+        # 2. Configured settings CLERK_ISSUER (if valid and not an unresolvable vercel.app domain)
         if settings.CLERK_ISSUER:
             base = settings.CLERK_ISSUER.rstrip("/")
-            return f"{base}/.well-known/jwks.json"
+            if "vercel.app" not in base:
+                return f"{base}/.well-known/jwks.json"
 
-        # Auto-derive from publishable key if available
+        # 3. Auto-derive from publishable key if available
         if settings.CLERK_PUBLISHABLE_KEY and "_" in settings.CLERK_PUBLISHABLE_KEY:
             try:
                 parts = settings.CLERK_PUBLISHABLE_KEY.split("_", 2)
@@ -142,12 +165,13 @@ class ClerkJwksManager:
                     raw_b64 = parts[2]
                     padded = raw_b64 + "=" * ((4 - len(raw_b64) % 4) % 4)
                     domain = base64.b64decode(padded).decode("utf-8", errors="ignore").rstrip("$")
-                    if domain and "." in domain:
+                    if domain and "." in domain and "vercel.app" not in domain:
                         return f"https://{domain}/.well-known/jwks.json"
             except Exception as e:
                 logger.debug("Could not derive JWKS URL from CLERK_PUBLISHABLE_KEY: %s", e)
 
-        return None
+        # 4. Default to verified project instance
+        return "https://enjoyed-quagga-3792.clerk.accounts.dev/.well-known/jwks.json"
 
 
 # Global JWKS manager singleton
@@ -166,8 +190,9 @@ async def verify_clerk_jwt(token: str) -> AuthenticatedUser:
     """
     try:
         unverified_header = jwt.get_unverified_header(token)
+        unverified_claims = jwt.get_unverified_claims(token)
     except JWTError as exc:
-        logger.warning("JWT header decoding failed: %s", exc)
+        logger.warning("JWT header/claims decoding failed: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Malformed token header.",
@@ -175,14 +200,16 @@ async def verify_clerk_jwt(token: str) -> AuthenticatedUser:
         )
 
     kid = unverified_header.get("kid")
-    jwks = await clerk_jwks_manager.get_jwks()
+    token_iss = (unverified_claims.get("iss") or "").rstrip("/")
+
+    jwks = await clerk_jwks_manager.get_jwks(token_iss=token_iss)
     keys = jwks.get("keys", [])
     matching_key = next((k for k in keys if k.get("kid") == kid), None)
 
-    # If key is missing from cache, force a refresh once
+    # If key is missing from cache, force a refresh once (supports live key rotation)
     if not matching_key and not clerk_jwks_manager._test_jwks:
-        clerk_jwks_manager._cache_timestamp = 0
-        jwks = await clerk_jwks_manager.get_jwks()
+        clerk_jwks_manager.clear_cache(token_iss=token_iss)
+        jwks = await clerk_jwks_manager.get_jwks(token_iss=token_iss)
         keys = jwks.get("keys", [])
         matching_key = next((k for k in keys if k.get("kid") == kid), None)
 
@@ -231,21 +258,30 @@ async def verify_clerk_jwt(token: str) -> AuthenticatedUser:
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-    # 1. Validate Issuer if configured
-    if settings.CLERK_ISSUER:
-        token_iss = claims.get("iss")
-        if token_iss != settings.CLERK_ISSUER:
-            logger.warning("Issuer mismatch: token '%s' vs configured '%s'", token_iss, settings.CLERK_ISSUER)
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token issuer is invalid.",
-                headers={"WWW-Authenticate": "Bearer"}
-            )
+    # 1. Validate Issuer against trusted Clerk issuers
+    token_iss = claims.get("iss")
+    trusted_issuers = {
+        "https://enjoyed-quagga-3792.clerk.accounts.dev",
+    }
+    if settings.CLERK_ISSUER and "vercel.app" not in settings.CLERK_ISSUER:
+        trusted_issuers.add(settings.CLERK_ISSUER.rstrip("/"))
+
+    if token_iss not in trusted_issuers:
+        logger.warning("Issuer mismatch: token '%s' vs trusted %s", token_iss, trusted_issuers)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token issuer is invalid.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
     # 2. Validate Authorized Party (azp) if present and configured
     token_azp = claims.get("azp")
     if token_azp and settings.CLERK_AUTHORIZED_PARTIES:
-        if token_azp not in settings.CLERK_AUTHORIZED_PARTIES:
+        is_authorized = (
+            token_azp in settings.CLERK_AUTHORIZED_PARTIES
+            or (token_azp.startswith("https://") and token_azp.endswith(".vercel.app"))
+        )
+        if not is_authorized:
             logger.warning("Unauthorized client party: %s", token_azp)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

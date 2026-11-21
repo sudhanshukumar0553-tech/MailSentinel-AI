@@ -41,7 +41,7 @@ const SAMPLE_URLS = [
   },
   {
     label: "Private IP (SSRF Test)",
-    url: "http://127.0.0.1:8000/internal-metrics"
+    url: "http://10.0.0.1/internal-metrics"
   },
   {
     label: "Legitimate Target",
